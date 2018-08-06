@@ -1,0 +1,42 @@
+
+3-5 meters per second at ground layer
+28 meters per second at 11 kilometers
+15 meters per second at 16 kilometers
+
+Think about pixel size in terms of meters
+
+2 miliseconds for sampling time
+
+
+Some other questions -- how to do amplitude estimation?
+
+If you don't have wavefront sensor data, what to do?
+Use spectral holes, and other spectral data.
+How to do slick implementation of this?
+
+Uncderstand spectral ratio and spectral holes in my
+own language -- get better understanding of this.
+
+How to cascade several frozen flows together -- if we have
+a minutes worth of data, break it up into 10 different
+FFH time frames, and then cascade together.  Different
+FFH problems can be solved separately, and then tied
+together.
+
+------------------
+
+Generate polychromatic PSF (600 mm -- 900 mm)
+this is an integration problem.
+
+Given phi(k), k = 1:nframes.  Then
+
+for k = 1:nframes
+  for lambda = lambda_min : lambda_max
+    * stretch/shrink phi(k) (keep hard edge)
+    * scale (multiply by some scalar found by ratio of wavelengths)
+    * compute PSF
+    * accumulate sum of PSFs
+  end
+  nomalize PSFs (sum to one)
+end
+
