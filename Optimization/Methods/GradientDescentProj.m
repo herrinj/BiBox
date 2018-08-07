@@ -1,8 +1,8 @@
-function [yc,his] = GaussNewtonProj(fctn,y0,varargin)
+function [yc,his] = GradientDescentProj(fctn, y0, varargin)
 %
-% function [yc,his] = GaussNewtonProj(fctn,y0,varargin)
+% function [yc,his] = GradientDescentProj(fctn,y0,varargin)
 %
-% Projected Gauss-Newton with Projected Armijo line search for minimizing 
+% Projected gradient gescent with armijo line search for minimizing 
 % J = fctn(yc)
 % 
 % Input:
@@ -17,45 +17,12 @@ function [yc,his] = GaussNewtonProj(fctn,y0,varargin)
 %==============================================================================
 
 if nargin==0
-   fctn = @Rosenbrock;
-   
-   % Solve with no bounds
-   [y_nb,his] = GaussNewtonProj(fctn, [4;2],'verbose',0);
-   
-   % Solve with lower bound
-   lower_bound = [1.1; -1.0];
-   y_lb = GaussNewtonProj(fctn, [4;2],'verbose',0, 'lower_bound', lower_bound);
-
-   % Solve with upper bound
-   upper_bound = [4.0; 0.9];
-   y_ub = GaussNewtonProj(fctn,[0;-1],'verbose',0, 'upper_bound', upper_bound);
-   
-   % Solve with both
-   y_bb = GaussNewtonProj(fctn,[4.0; 0.0],'verbose',0, 'lower_bound', lower_bound, 'upper_bound', upper_bound);
-   
-   
-   fprintf('numerical solution: y = [%1.4f, %1.4f]\n',y_nb);
-   fprintf('numerical solution: y_lb = [%1.4f, %1.4f]\n',y_lb);
-   fprintf('numerical solution: y_ub = [%1.4f, %1.4f]\n',y_ub);
-   fprintf('numerical solution: y_bb = [%1.4f, %1.4f]\n',y_bb);
-
-   
-   [X,Y] = ndgrid(linspace(-1,2,101));
-   F = reshape(fctn([X(:),Y(:)]'),size(X));
-   figure; 
-   contour(X,Y,F,200); hold on;
-   plot(y_nb(1),y_nb(2)  ,'ro');
-   plot(y_lb(1),y_lb(2),'rd');
-   plot(y_ub(1),y_ub(2),'r*');
-   plot(y_bb(1),y_bb(2),'rh');
-   
-   yc   = [];
-   his  = [];
+   runMinimalExample;
    return;
 end
 
-% Gauss-Newton parameters
-maxIter      = 50;
+% Gradient descent parameters
+maxIter      = 100;
 yStop        = [];
 Jstop        = [];
 paraStop     = [];
@@ -63,17 +30,12 @@ tolJ         = 1e-4;            % stopping tolerance, objective function
 tolY         = 1e-4;            % stopping tolerance, norm of solution
 tolG         = 1e-4;            % stopping tolerance, norm of gradient
 
-% Gauss-Newton step solve parameters
-solver       = [];             
-solverMaxIter= 50;              
-solverTol    = 1e-1;
-
 % Bound constraints (do not work with complex variables)
 upper_bound  = Inf*ones(numel(y0),1);   
 lower_bound  = -Inf*ones(numel(y0),1);
 
 % Line search parameters
-lsMaxIter    = 10;           % maximum number of line search iterations
+lsMaxIter    = 100;           % maximum number of line search iterations
 lsReduction  = 1e-4;         % reduction constant for Armijo condition
 lineSearch   = @proj_armijo; % Could potentially call to other projected LS
 
@@ -106,7 +68,7 @@ hisStr       = {'iter','J','Jold-J','|proj_dJ|','|dy|','LS','Active'};
 
 yc = y0;
 active = (yc <= lower_bound)|(yc >= upper_bound);
-[Jc,para,dJ,op] = fctn(yc); 
+[Jc,para,dJ] = fctn(yc); 
 proj_dJ = proj_grad(dJ, yc, lower_bound, upper_bound);
 Plots('start',para);
 iter = 0; yOld = 0*yc; Jold = Jc;
@@ -134,7 +96,7 @@ if verbose
     dispHis(hisArray(1,:));
 end
 
-% Start projected Gauss-Newton iteration
+% Start projected gradient descent iteration
 while 1
    
     % Check stopping criteria
@@ -149,26 +111,8 @@ while 1
     
     iter = iter+1;  
     
-    % Gauss-Newton step on inactive set
-    [dy_in, solverInfo] = stepGN(op,-dJ,solver, 'active', active, 'solverMaxIter', solverMaxIter, 'solverTol', solverTol);
-    
-    % Pull out updated gradient
-    if isfield(solverInfo,'dJ')
-        dJ = solverInfo.dJ;
-    end
-    
-    % Projected gradient descent on active set
-    dy_act = zeros(size(yc));
-    dy_act(yc == lower_bound) = -dJ(yc == lower_bound); 
-    dy_act(yc == upper_bound) = -dJ(yc == upper_bound);    
-    
-    % Combine the steps
-    if sum(active)==0
-        nu = 0;
-    else
-        nu = max(abs(dy_in))/max(abs(dy_act)); % scaling factor (Haber, Geophysical Electromagnetics, p.110)
-    end
-    dy = dy_in + nu*dy_act;
+    % Step direction
+    dy = -dJ(:);
     
     % Line search
     [yt, exitFlag, lsIter] = lineSearch(fctn, yc, dy, Jc, proj_dJ, lower_bound, upper_bound, lsMaxIter, lsReduction); 
@@ -176,7 +120,7 @@ while 1
     % Save old values and re-evaluate objective function
     yOld = yc; Jold = Jc; yc = yt;
     active = (yc <= lower_bound)|(yc >= upper_bound);      % update active set
-    [Jc,para,dJ,op] = fctn(yc);                              % evalute objective function
+    [Jc,para,dJ] = fctn(yc);                              % evalute objective function
     proj_dJ = proj_grad(dJ, yc, lower_bound, upper_bound);  % projected gradient
   
     % Some output
@@ -246,7 +190,10 @@ function [yt, exitFlag, iter] = proj_armijo(fctn, yc, dy, Jc, proj_dJ, lower_bou
 %               iter - number of line search iterations
 %
 
-t = 1; % initial step 1 for Gauss-Newton
+persistent t;
+if isempty(t)
+    t = 1; % initial step 1 for Gauss-Newton
+end
 iter = 1;
 cond = zeros(2,1);
 
@@ -263,6 +210,9 @@ while 1
     cond(2) = (iter >=lsMaxIter);
     
     if cond(1)
+        if (iter ==1)
+            t = 2*t;
+        end
         exitFlag = 1;
         break; 
     elseif cond(2)
@@ -318,4 +268,39 @@ if nargout>2 && size(x,2)==1
     end
     d2f(n,n-1)=-400*x(n-1); d2f(n,n)=200;
 end
+end
+
+function runMinimalExample
+   fctn = @Rosenbrock;
+   
+   % Solve with no bounds
+   [y_nb,his] = GradientDescentProj(fctn, [0.0;0.0],'verbose',0);
+   
+   % Solve with lower bound
+   lower_bound = [1.1; 0];
+   y_lb = GradientDescentProj(fctn, [1.2;1.2],'verbose',0, 'lower_bound', lower_bound);
+
+   % Solve with upper bound
+   upper_bound = [4.0; 0.9];
+   y_ub = GradientDescentProj(fctn,[0.8;0.8],'verbose',0, 'upper_bound', upper_bound);
+   
+   % Solve with both
+   y_bb = GradientDescentProj(fctn,[1.2; 0.8],'verbose',0, 'lower_bound', lower_bound, 'upper_bound', upper_bound);
+   
+   
+   fprintf('numerical solution: y = [%1.4f, %1.4f]\n',y_nb);
+   fprintf('numerical solution: y_lb = [%1.4f, %1.4f]\n',y_lb);
+   fprintf('numerical solution: y_ub = [%1.4f, %1.4f]\n',y_ub);
+   fprintf('numerical solution: y_bb = [%1.4f, %1.4f]\n',y_bb);
+
+   
+   [X,Y] = ndgrid(linspace(-1,2,101));
+   F = reshape(fctn([X(:),Y(:)]'),size(X));
+   figure; 
+   contour(X,Y,F,200); hold on;
+   plot(y_nb(1),y_nb(2)  ,'ro');
+   plot(y_lb(1),y_lb(2),'rd');
+   plot(y_ub(1),y_ub(2),'r*');
+   plot(y_bb(1),y_bb(2),'rh');
+   
 end

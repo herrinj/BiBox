@@ -15,18 +15,19 @@ function [b,rr] = bindex(N,fourier_rad, second_rad, visualizer)
 %   Output:     b - indexing structure containing the following fields 
 %             b.u - list of u indices
 %             b.v - list of v indices
-%           b.u_v - list of u+v indices (note: I freqently call u+v = s)
+%           b.u_v - list of u+v indices (note: call u+v = s in code)
 %
 %
 if nargin <3
     runMinimalExample
+    return;
 end
 
 if nargin < 4
     visualizer = 0;
 end
 
-% First, I created a grid of spatial frequencies and also their angles so
+% First, created a grid of spatial frequencies and also their angles so
 % that I can increase my u+v vector radially.
 [xx,yy] = meshgrid(-N/2:N/2-1, N/2:-1:-N/2 +1); % center (N/2 +1,N/2 +1)
 rr = (xx.*xx + yy.*yy).^0.5;
@@ -46,8 +47,9 @@ v_final = [];
 s_final = [];
 
 
-% First, I collect a small(er) index of all the u+v indices (called s_inds) sorted by increasing order of
-% radius and then angle from [0,2pi]. We want all s_inds less than the Fourier radius from DC
+% Collect a small(er) index of all the u+v indices (called s_inds) sorted 
+% by increasing order radius and angle from [0,2pi]. We want all s_inds 
+% less than the Fourier radius from DC
 
 for ii = 1:length(s_mags)-1  % |s| from change of variables
     s_temp = find(rr > s_mags(ii) & rr <= s_mags(ii+1));
@@ -57,9 +59,8 @@ for ii = 1:length(s_mags)-1  % |s| from change of variables
 end
 
 
-% Second, I collect the set of v_inds I'm interested in. Again, this is
-% sorted by order of increasing radius and then angle. 
-
+% Collect the set of v_inds. Again, this is sorted by order of increasing 
+% radius and then angle. 
 for jj = 1:length(v_mags)-1
     v_temp = find(rr > v_mags(jj) & rr <= v_mags(jj+1));
     [~,P] = sort(theta(v_temp),'descend');
@@ -68,34 +69,30 @@ for jj = 1:length(v_mags)-1
 end
 
 
-% Thirdly, I need to get the resulting u vectors. Given the u+v and v sets
-% above for each potential u+v(j) = s(j), I should be able to displace the 
-% v_inds to have center u+v(j) and then calculate the set of u_inds that is
-% corresponds to the shifted v_inds and adds up to u+v(j). Lastly, these are
-% loaded into the final indices
+% Thirdly, get the resulting u vectors. Given the s=u+v and v sets above 
+% Calculate the set of u indices by u=s-v
 
-[x_cent,y_cent] = ind2sub([N,N], dc_ind); % coordinates of dc for calculating displacement
+[x_cent,y_cent] = ind2sub([N,N], dc_ind); % dc coordinates dc for calculating displacement
 [v1,v2] = ind2sub([N,N],v_inds); % coordinates of the unshifted v and s points
 [s1,s2] = ind2sub([N,N],s_inds);
 
 for kk = 1:length(s_inds)
-    % First, find the u coordinate by noting u+v = s implies u = s-v, then shift for matrix coordinates 
+    % First, find the u coordinate by noting u+v = s implies u = s-v, then 
+    % shift for matrix coordinates 
     u1 = s1(kk) - v1;
     u2 = s2(kk) - v2;
     u1 = u1 + x_cent;
     u2 = u2 + y_cent;
 
-
-    % Next, find the set of u coordinates that are inside the "matrix" (needed
-    % near the boundary.) 
+    % Next, find the set of u coordinates that are inside the "matrix" 
+    % (needed near the boundary.) 
     bd_sub = find((0 < u1 & u1 < N+1) & (0 < u2 & u2 < N+1)); 
     u_temp = sub2ind([N,N], u1(bd_sub),u2(bd_sub));
     
-    % Then, find the set of u coordinates that are inside the prescribed fourier
-    % radius
+    % Find the set of u coordinates that are inside the Fourier radius
     bd_rad = find(rr(u_temp) <= fourier_rad);
     
-    % Lastly, update all three final indices to be loaded into the structure.
+    % Update all three final indices to be loaded into the structure.
     % For each loop, u+v = s will add the same index many times to
     % correspond to all the possible u and v such that u+v = s
     u_final = [u_final; u_temp(bd_rad)];
@@ -120,9 +117,7 @@ b.u = u_final;
 b.v = v_final;
 b.u_v = s_final;
 
-
-
-%Visualizer: comment in/out accordingly
+%Visualizer: optional 4th input to turn on/off
 if visualizer 
     figure;
     [ux,uy] = ind2sub([N,N],b.u);
@@ -154,11 +149,14 @@ if visualizer
     end
 end
 
+end
+
 function runMinimalExample
     N = 64;
     fourier_rad = 32;
     second_rad = 5;
-    visualizer = 1;
+    visualizer = 0;
     
     b = bindex(N, fourier_rad, second_rad, visualizer);
+end
 

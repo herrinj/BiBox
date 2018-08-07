@@ -470,9 +470,10 @@ switch solver
         solveInfo = [];
     
     case 'bispectrum'
+        rhs     = rhs(:);
         Q       = speye(numel(rhs));
         Q       = Q(:,~active);
-        proj_op = @(x) Q'*op.operator(Q*x);
+        proj_op = @(x) Q'*op(Q*x);
         dy      = zeros(numel(rhs),1);
         [dy(not(active)),~,~,iters] = pcg(proj_op,rhs(not(active)),solverTol,solverMaxIter);
         solveInfo.iters = iters;

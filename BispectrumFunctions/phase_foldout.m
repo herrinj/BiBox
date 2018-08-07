@@ -1,14 +1,15 @@
 function [full_phase] = phase_foldout(half_phase, visualizer)
 %
-% Takes a Fourier phase defined on the plane in either phase (double)
-% or phasor (complex) form and exploits symmetry to form a full phase.
-% Also, given a 3 dimensional array of phases should fold out across the
-% 3rd dimension
+% Takes a Fourier phase defined on left half-plane in either phase (double)
+% or phasor (complex) form and exploits symmetry to form a full phase. This
+% along with a symmetric power spectrum ensures a real-valued image in
+% image space. Also, given a 3 dimensional array of phases should fold out 
+% across the 3rd dimension
 %
 % Inputs:  half_phase - can be either phase (double) or phasor(complex),
-%                       assumes the computed phase to exist on the left half
-%                       of the Fourier plane (left of DC, quadrants 2,3).
-%                       The phase should be truncated by the pupil mask
+%                       assumes the computed phase to exist on the left 
+%                       half of the Fourier plane (quadrants 2,3). The 
+%                       phase should be truncated by the pupil mask
 %                   
 %          visualizer - 0 is no, 1 is yes if you want to see the results
 %

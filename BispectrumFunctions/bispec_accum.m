@@ -43,4 +43,4 @@ cov_IR = IR - imag(bisp).*real(bisp);
 beta = angle(sum(bisp)/length(bisp));
 snr_weights = abs(bisp)./(sigma_I*cos(beta)*cos(beta) + sigma_R*sin(beta)*sin(beta) - cov_IR*sin(2*beta)).^0.5;
 
-
+end

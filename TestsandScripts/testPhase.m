@@ -10,7 +10,7 @@
 path_SpeckleImagingCodes;
 [nfr, D_r0, image_name, K_n, sigma_rn] = setupBispectrumParams('nfr',50);
 setupBispectrumData;
-image_recur = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(i*phase_recur(:)),[256 256])))));
+image_recur = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*phase_recur(:)),[256 256])))));
 its = 50;
 tol = 1e-5;
 avg_data_frame = sum(data,3)/size(data,3); avg_data_frame = avg_data_frame/max(avg_data_frame(:));

@@ -1,4 +1,4 @@
-function [yc,his] = GaussNewtonProj(fctn,y0,varargin)
+function [yc,his] = GradientDescent(fctn, y0, varargin)
 %
 % function [yc,his] = GaussNewtonProj(fctn,y0,varargin)
 %
@@ -110,7 +110,7 @@ active = (yc <= lower_bound)|(yc >= upper_bound);
 proj_dJ = proj_grad(dJ, yc, lower_bound, upper_bound);
 Plots('start',para);
 iter = 0; yOld = 0*yc; Jold = Jc;
-hisArray(1,:) = [0 , Jc, Jc, norm(proj_dJ), norm(y0), 0, sum(active>0)];
+hisArray(1,:) = [0 , Jc, Jc, norm(proj_dJ), 0, 0, sum(active>0)];
 
 
 % Save iterates
