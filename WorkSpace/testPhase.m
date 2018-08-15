@@ -2,6 +2,7 @@
 %   This file tests optimization using projected Gauss-Newton with the
 %   phase and phasor objective functions. 
 %
+
 clear all; close all;
 
 % Setup data
