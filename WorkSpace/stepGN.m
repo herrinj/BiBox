@@ -469,14 +469,61 @@ switch solver
         dy = dw(:);    
         solveInfo = [];
     
-    case 'bispectrum'
+    case 'bispIm'
+        %
+        %   Operator-based call to PCG on inactive set for imphase and
+        %   imphasor objective functions for bispectral imaging
+        %
         rhs     = rhs(:);
         Q       = speye(numel(rhs));
         Q       = Q(:,~active);
-        proj_op = @(x) Q'*op(Q*x);
+        proj_op = @(x) Q'*op(Q*x); % Restrict operator to inactive set
         dy      = zeros(numel(rhs),1);
         [dy(not(active)),~,~,iters] = pcg(proj_op,rhs(not(active)),solverTol,solverMaxIter);
         solveInfo.iters = iters;
+       
+    case 'bispPhFull'    
+        %
+        %   Matrix-based solver for phase update for bispectral imaging
+        %   codes using phase and phasor objective functions 
+        %
+        rhs     = rhs(:);
+        H       = op.matrix;
+        dy      = H\rhs;
+        solveInfo = [];    
+        
+    case 'bispPhTrunc'  
+        %
+        %   Matrix-based solver for phase update for bispectral imaging
+        %   codes using phase and phasor objective functions 
+        %
+        rhs     = rhs(:);
+        Hp      = op.matrix; % truncated, permuted Hessian
+        p       = op.perm;
+        dim     = op.dim;
+        dy      = zeros(length(rhs(:)),1);
+        rhsp    = rhs(p);
+        rhsp    = rhsp(1:dim);
+        dyp     = Hp\rhsp;
+        dy(p(1:dim)) = dyp;   
+        solveInfo = [];    
+        
+    case 'bispPhIchol'  
+        %
+        %   Matrix-based solver for phase update for bispectral imaging
+        %   codes using phase and phasor objective functions 
+        %
+        rhs     = rhs(:);
+        L       = op.matrix; % (incomplete) Cholesky factor of truncated, permuted Hessian
+        p       = op.perm;
+        dim     = op.dim;
+        dy      = zeros(length(rhs(:)),1);
+        rhsp    = rhs(p);
+        rhsp    = rhsp(1:dim);
+        dyp     = L'\(L\rhsp);
+        dy(p(1:dim)) = dyp;   
+        solveInfo = [];
+        
 end
 
 end

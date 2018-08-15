@@ -73,9 +73,9 @@ if doHess
                 [i,j]   = find(ADAp~=0);
                 ADAp    = ADAp(1:max(i),1:max(j));
                 dim     = max(j);
-            
+                
                 % Load the truncated Hessian, permutation, dimension, and flag
-                Hper.matrix= Hp;
+                Hper.matrix= ADAp;
                 Hper.perm  = p;
                 Hper.dim   = dim; 
                 Hper.flag  = Hflag;

@@ -83,7 +83,7 @@ if doHess
                 dim     = max(j);
             
                 % Load the truncated Hessian, permutation, dimension, and flag
-                Hper.matrix= Hp;
+                Hper.matrix= ADAp;
                 Hper.perm  = p;
                 Hper.dim   = dim; 
                 Hper.flag  = Hflag;
