@@ -1,8 +1,9 @@
-function [yc,his] = NLCG(fctn, y0, varargin)
+function [yc,his] = LBFGS(fctn, y0, varargin)
 %
-% function [yc,his] = NLCG(fctn,y0,varargin)
+% function [yc,his] = LBFGS(fctn,y0,varargin)
 %
-% Nonlinear conjugate gradient with armijo line search for minimizing 
+% Limited memory Broyden Fletcher Goldfarb Shanno algorithm
+% with armijo line search for minimizing 
 % J = fctn(yc)
 % 
 % Input:
@@ -21,17 +22,18 @@ if nargin==0
    return;
 end
 
-% Gradient descent parameters
+% LBFGS parameters
 maxIter      = 100;
 yStop        = [];
 Jstop        = [];
 paraStop     = [];
-tolJ         = 1e-4;            % stopping tolerance, objective function
-tolY         = 1e-4;            % stopping tolerance, norm of solution
-tolG         = 1e-4;            % stopping tolerance, norm of gradient
+tolJ         = 1e-4;         % stopping tolerance, objective function
+tolY         = 1e-4;         % stopping tolerance, norm of solution
+tolG         = 1e-4;         % stopping tolerance, norm of gradient
+stepHis      = 10;           % number of vectors to use for LBFGS history       
 
 % Line search parameters
-lsMaxIter    = 1000;          % maximum number of line search iterations
+lsMaxIter    = 100;          % maximum number of line search iterations
 lsReduction  = 1e-4;         % reduction constant for Armijo condition
 lineSearch   = @armijo;      % Could potentially call to other projected LS
 
@@ -61,12 +63,17 @@ his          = [];
 hisArray     = zeros(maxIter+1,5);
 hisStr       = {'iter','J','Jold-J','|dy|','LS'};
 
-yc = y0;
+yc      = y0;
+sk      = zeros(numel(y0),stepHis);
+yk      = zeros(numel(y0),stepHis);
+rhok    = zeros(stepHis,1);
 [Jc,para,dJ] = fctn(yc); 
 Plots('start',para);
-iter = 0; yOld = 0*yc; Jold = Jc; beta = 0; dy = 0*yc;
+iter = 0; yOld = 0*yc; Jold = Jc; dy = 0*yc;
 hisArray(1,:) = [0 , Jc, Jc, norm(y0), 0];
-
+sk(:,1)     = y0(:);
+yk(:,1)     = dJ(:);         
+rhok(1)     = 1/(sk(:,1)'*yk(:,1));
 
 % Save iterates
 if iterSave
@@ -100,16 +107,17 @@ while 1
     iter = iter+1;  
     
     % Step direction
-    dy = -dJ(:) + beta*dy(:);
+    dy = -stepLBFGS(dJ,sk,yk,rhok);
     
     % Line search
     [yt, exitFlag, lsIter] = lineSearch(fctn, yc, dy, Jc, dJ, lsMaxIter, lsReduction); 
     
     % Save old values and re-evaluate objective function
-    yOld = yc; Jold = Jc; yc = yt; dJold = dJ; dy = yt - yc;
+    yOld = yc; Jold = Jc; yc = yt; dJold = dJ;
     [Jc,para,dJ] = fctn(yc);
-    beta = (norm(dJ)^2)/(norm(dJold)^2); % Fletcher-Reeves
-%     beta  = (reshape(dJ,[],1)*(dJ(:)-dJold(:)))/(norm(dJold)^2); % Polak-Ribiere   
+    sk      = [yc - yOld, sk(:,1:stepHis-1)];
+    yk      = [dJ(:) - dJold(:), yk(:,1:stepHis-1)];      
+    rhok    = [1/(sk(:,1)'*yk(:,1)); rhok(1:stepHis-1)];
     
     % Some output
     hisArray(iter+1,:) = [iter, Jc, Jold-Jc, norm(yc-yOld), lsIter];
@@ -154,6 +162,38 @@ if verbose
     %FAIRmessage([mfilename,' : done !'],'=');
 end
     
+end
+
+function dy = stepLBFGS(dJ,sk,yk,rhok)
+%
+%   Computes limited memory BFGS step using two loop recursion
+%
+%   Input:  dJ - current gradient
+%           sk - set of sk vectors
+%           yk - set of yk vectors
+%         rhok - set of rhok constants
+%
+%   Output: dy - computed LBFGS step 
+%       
+
+[n,m]   = size(yk);
+gamma   = (sk(:,1)'*yk(:,1))/(yk(:,1)'*yk(:,1));
+H0      = gamma*speye(n);
+alphak  = zeros(m,1);
+dy      = dJ(:);
+
+for j = 1:m
+    alphak(j) = rhok(j)*(sk(:,j)'*dy);
+    dy     = dy - alphak(j)*yk(:,j);
+end
+
+dy = H0*dy;
+
+for j = m:-1:1
+    betak   = (yk(:,j)'*dy)*rhok(j);
+    dy      = dy + (alphak(j) - betak)*sk(:,j);
+end
+
 end
 
 function [yt, exitFlag, iter] = armijo(fctn, yc, dy, Jc, dJ, lsMaxIter, lsReduction) 
@@ -234,7 +274,7 @@ function runMinimalExample
    fctn = @Rosenbrock;
    
    % Solve with no bounds
-   [y_nb,his] = NonlinearCG(fctn, [0.5;1.3],'verbose',1,'maxIter',1000);
+   [y_nb,his] = LBFGS(fctn, [-0.5;2.0],'verbose',1,'maxIter',1000);
    
    fprintf('numerical solution: y = [%1.4f, %1.4f]\n',y_nb);
    
