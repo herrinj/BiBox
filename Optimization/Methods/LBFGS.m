@@ -64,16 +64,14 @@ hisArray     = zeros(maxIter+1,5);
 hisStr       = {'iter','J','Jold-J','|dy|','LS'};
 
 yc      = y0;
-sk      = zeros(numel(y0),stepHis);
-yk      = zeros(numel(y0),stepHis);
-rhok    = zeros(stepHis,1);
+sk      = [];
+yk      = [];
+rhok    = [];
+gammak  = [];
 [Jc,para,dJ] = fctn(yc); 
 Plots('start',para);
 iter = 0; yOld = 0*yc; Jold = Jc; dy = 0*yc;
-hisArray(1,:) = [0 , Jc, Jc, norm(y0), 0];
-sk(:,1)     = y0(:);
-yk(:,1)     = dJ(:);         
-rhok(1)     = 1/(sk(:,1)'*yk(:,1));
+hisArray(1,:) = [0 , Jc, Jc, norm(y0), 0];         
 
 % Save iterates
 if iterSave
@@ -107,7 +105,7 @@ while 1
     iter = iter+1;  
     
     % Step direction
-    dy = -stepLBFGS(dJ,sk,yk,rhok);
+    dy = -stepLBFGS(dJ,sk,yk,rhok,gammak,stepHis);
     
     % Line search
     [yt, exitFlag, lsIter] = lineSearch(fctn, yc, dy, Jc, dJ, lsMaxIter, lsReduction); 
@@ -115,9 +113,16 @@ while 1
     % Save old values and re-evaluate objective function
     yOld = yc; Jold = Jc; yc = yt; dJold = dJ;
     [Jc,para,dJ] = fctn(yc);
-    sk      = [yc - yOld, sk(:,1:stepHis-1)];
-    yk      = [dJ(:) - dJold(:), yk(:,1:stepHis-1)];      
-    rhok    = [1/(sk(:,1)'*yk(:,1)); rhok(1:stepHis-1)];
+    if isempty(sk)
+        sk = yc-yOld;
+        yk = dJ(:) - dJold(:);
+        rhok = 1/(sk(:,1)'*yk(:,1));
+    else
+        sk      = [yc - yOld, sk(:,1:min(stepHis-1,iter-1))];
+        yk      = [dJ(:) - dJold(:), yk(:,1:min(stepHis-1,iter-1))];      
+        rhok    = [1/(sk(:,1)'*yk(:,1)); rhok(1:min(stepHis-1,iter-1))];
+        gammak  = (sk(:,1)'*yk(:,1))/(yk(:,1)'*yk(:,1));
+    end
     
     % Some output
     hisArray(iter+1,:) = [iter, Jc, Jold-Jc, norm(yc-yOld), lsIter];
@@ -164,7 +169,7 @@ end
     
 end
 
-function dy = stepLBFGS(dJ,sk,yk,rhok)
+function dy = stepLBFGS(dJ,sk,yk,rhok,gammak,stepHis)
 %
 %   Computes limited memory BFGS step using two loop recursion
 %
@@ -172,24 +177,30 @@ function dy = stepLBFGS(dJ,sk,yk,rhok)
 %           sk - set of sk vectors
 %           yk - set of yk vectors
 %         rhok - set of rhok constants
+%       gammak - weight for H0 matrix
+%      stepHis - number of vectors in LBFGS history
 %
 %   Output: dy - computed LBFGS step 
 %       
 
+if isempty(sk)
+    dy = dJ(:);
+    return;
+end
+
 [n,m]   = size(yk);
-gamma   = (sk(:,1)'*yk(:,1))/(yk(:,1)'*yk(:,1));
-H0      = gamma*speye(n);
-alphak  = zeros(m,1);
+H0      = speye(n); % gammak*speye(n) 
+alphak  = zeros(stepHis,1);
 dy      = dJ(:);
 
-for j = 1:m
+for j = 1:min([stepHis m])
     alphak(j) = rhok(j)*(sk(:,j)'*dy);
     dy     = dy - alphak(j)*yk(:,j);
 end
 
 dy = H0*dy;
 
-for j = m:-1:1
+for j = min([stepHis m]):-1:1
     betak   = (yk(:,j)'*dy)*rhok(j);
     dy      = dy + (alphak(j) - betak)*sk(:,j);
 end

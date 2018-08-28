@@ -70,6 +70,29 @@ clear NonlinearCG;
 clear imphasorObjFctn;
 
 %%
+% Run NLCG for imphase
+fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', 100.0,'regularizer','pos');
+tic();
+[imphase_BFGS, his_imphase_BFGS] = LBFGS(fctn, image_recur(:), 'maxIter',maxIter,...
+                                        'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
+                                        'iterSave',true);
+time_imphase_BFGS = toc();
+imphase_BFGS = reshape(imphase_BFGS,[256 256]);
+clear LBFGS;
+clear imphaseObjFctn;
+
+% Run NLCG for imphasor
+fctn = @(x) imphasorObjFctn(x,A, bispec_phase,dims, pupil_mask,'alpha',100.0,'regularizer','pos');
+tic();
+[imphasor_BFGS, his_imphasor_BFGS] = LBFGS(fctn, image_recur(:),'maxIter',maxIter,...
+                                          'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
+                                          'iterSave',true);
+time_imphasor_BFGS = toc();
+imphasor_BFGS = reshape(imphasor_BFGS, [256 256]);
+clear LBFGS;
+clear imphasorObjFctn;
+
+%%
 % Run Gauss-Newton for imphase
 fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', 100.0,'regularizer','pos');
 tic();
@@ -152,32 +175,36 @@ image_proj      = image_proj/max(image_proj(:));
 avg_data_frame  = avg_data_frame/max(avg_data_frame(:));
 imphase_GD      = imphase_GD/max(imphase_GD(:));
 imphase_NLCG    = imphase_NLCG/max(imphase_NLCG(:));
+imphase_BFGS    = imphase_BFGS/max(imphase_BFGS(:));
 imphase_GN      = imphase_GN/max(imphase_GN(:));
 imphase_PGN     = imphase_PGN/max(imphase_PGN(:));
 imphase_PGNR    = imphase_PGNR/max(imphase_PGNR(:));
 imphasor_GD     = imphasor_GD/max(imphasor_GD(:));
 imphasor_NLCG   = imphasor_NLCG/max(imphasor_NLCG(:));
+imphasor_BFGS   = imphasor_BFGS/max(imphasor_BFGS(:));
 imphasor_GN     = imphasor_GN/max(imphasor_GN(:));
 imphasor_PGN    = imphasor_PGN/max(imphasor_PGN(:));
 imphasor_PGNR   = imphasor_PGNR/max(imphasor_PGNR(:));
 
 figure; 
-subplot(3,5,1);  imagesc(reshape(obj,[256 256])); axis image; axis off; colorbar; title('truth'); 
-subplot(3,5,2);  imagesc(reshape(image_recur,[256 256])); axis image; axis off; colorbar; title('recur');
-subplot(3,5,3);  imagesc(reshape(image_proj, [256 256])); axis image; axis off; colorbar;  title('proj. recur');
-subplot(3,5,4);  imagesc(avg_data_frame); axis image; axis off; colorbar;  title('avg. blurred frame');
+subplot(3,6,2);  imagesc(reshape(obj,[256 256])); axis image; axis off; colorbar; title('truth'); 
+subplot(3,6,3);  imagesc(reshape(image_recur,[256 256])); axis image; axis off; colorbar; title('recur');
+subplot(3,6,4);  imagesc(reshape(image_proj, [256 256])); axis image; axis off; colorbar;  title('proj. recur');
+subplot(3,6,5);  imagesc(avg_data_frame); axis image; axis off; colorbar;  title('avg. blurred frame');
 
-subplot(3,5,6);  imagesc(imphase_GD); axis image; axis off; colorbar;  title('Imphase - GD');
-subplot(3,5,7);  imagesc(imphase_NLCG); axis image; axis off; colorbar;  title('Imphase - NLCG');
-subplot(3,5,8);  imagesc(imphase_GN); axis image; axis off; colorbar;  title('Imphase - GN');
-subplot(3,5,9);  imagesc(imphase_PGN); axis image; axis off; colorbar;  title('Imphase - PGN');
-subplot(3,5,10); imagesc(imphase_PGNR); axis image; axis off; colorbar;  title('Imphase - PGNR');
+subplot(3,6,7);  imagesc(imphase_GD); axis image; axis off; colorbar;  title('Imphase - GD');
+subplot(3,6,8);  imagesc(imphase_NLCG); axis image; axis off; colorbar;  title('Imphase - NLCG');
+subplot(3,6,9);  imagesc(imphase_BFGS); axis image; axis off; colorbar;  title('Imphase - LBFGS');
+subplot(3,6,10);  imagesc(imphase_GN); axis image; axis off; colorbar;  title('Imphase - GN');
+subplot(3,6,11);  imagesc(imphase_PGN); axis image; axis off; colorbar;  title('Imphase - PGN');
+subplot(3,6,12); imagesc(imphase_PGNR); axis image; axis off; colorbar;  title('Imphase - PGNR');
 
-subplot(3,5,11); imagesc(imphasor_GD); axis image; axis off; colorbar;  title('Imphasor - GD');
-subplot(3,5,12); imagesc(imphasor_NLCG); axis image; axis off; colorbar;  title('Imphasor - NLCG');
-subplot(3,5,13); imagesc(imphasor_GN); axis image; axis off; colorbar;  title('Imphasor - GN');
-subplot(3,5,14); imagesc(imphasor_PGN); axis image; axis off; colorbar;  title('Imphasor - PGN');
-subplot(3,5,15); imagesc(imphasor_PGNR); axis image; axis off; colorbar;  title('Imphasor - PGNR');
+subplot(3,6,13); imagesc(imphasor_GD); axis image; axis off; colorbar;  title('Imphasor - GD');
+subplot(3,6,14); imagesc(imphasor_NLCG); axis image; axis off; colorbar;  title('Imphasor - NLCG');
+subplot(3,6,15); imagesc(imphasor_BFGS); axis image; axis off; colorbar;  title('Imphasor - LBFGS');
+subplot(3,6,16); imagesc(imphasor_GN); axis image; axis off; colorbar;  title('Imphasor - GN');
+subplot(3,6,17); imagesc(imphasor_PGN); axis image; axis off; colorbar;  title('Imphasor - PGN');
+subplot(3,6,18); imagesc(imphasor_PGNR); axis image; axis off; colorbar;  title('Imphasor - PGNR');
 
 %%
 % Relative objective function
@@ -187,7 +214,9 @@ plot((0:size(his_imphase_GD.array,1)-1)',his_imphase_GD.array(:,2)/his_imphase_G
 hold on;
 plot((0:size(his_imphasor_GD.array,1)-1)',his_imphasor_GD.array(:,2)/his_imphasor_GD.array(1,2)); 
 plot((0:size(his_imphase_NLCG.array,1)-1)',his_imphase_NLCG.array(:,2)/his_imphase_NLCG.array(1,2)); 
-plot((0:size(his_imphasor_NLCG.array,1)-1)',his_imphasor_NLCG.array(:,2)/his_imphasor_NLCG.array(1,2)); 
+plot((0:size(his_imphasor_NLCG.array,1)-1)',his_imphasor_NLCG.array(:,2)/his_imphasor_NLCG.array(1,2));
+plot((0:size(his_imphase_BFGS.array,1)-1)',his_imphase_BFGS.array(:,2)/his_imphase_BFGS.array(1,2)); 
+plot((0:size(his_imphasor_BFGS.array,1)-1)',his_imphasor_BFGS.array(:,2)/his_imphasor_BFGS.array(1,2));
 plot((0:size(his_imphase_GN.array,1)-1)',his_imphase_GN.array(:,2)/his_imphase_GN.array(1,2)); 
 plot((0:size(his_imphasor_GN.array,1)-1)',his_imphasor_GN.array(:,2)/his_imphasor_GN.array(1,2)); 
 plot((0:size(his_imphase_PGN.array,1)-1)',his_imphase_PGN.array(:,2)/his_imphase_PGN.array(1,2)); 
@@ -195,9 +224,10 @@ plot((0:size(his_imphasor_PGN.array,1)-1)',his_imphasor_PGN.array(:,2)/his_impha
 plot((0:size(his_imphase_PGNR.array,1)-1)',his_imphase_PGNR.array(:,2)/his_imphase_PGNR.array(1,2)); 
 plot((0:size(his_imphasor_PGNR.array,1)-1)',his_imphasor_PGNR.array(:,2)/his_imphasor_PGNR.array(1,2));
 leg = legend('E1-GD-pen.reg','E2-GD-pen.reg','E1-NLCG-pen.reg','E2-NLCG-pen.reg',...
-             'E1-GN-pen.reg', 'E2-GN-pen.reg.','E1-PGN','E2-PGN','E1-PGN-R','E2-PGN-R');
+             'E1-LBFGS-pen.reg','E2-LBFGS-pen.reg','E1-GN-pen.reg', 'E2-GN-pen.reg.',...
+             'E1-PGN','E2-PGN','E1-PGN-R','E2-PGN-R');
 leg.FontSize = 14;
-tit = title('Rel. Obj. Func: ||J||/||J(0)||');
+tit = title('Rel. Obj. Func: $\frac{\|J\|}{\|J(0)\|}$','interpreter','latex');
 tit.FontSize = 16;
 %%
 % Relative error plots
@@ -205,6 +235,8 @@ its_imphase_GD      = his_imphase_GD.iters;
 its_imphasor_GD     = his_imphasor_GD.iters;
 its_imphase_NLCG    = his_imphase_NLCG.iters;
 its_imphasor_NLCG   = his_imphasor_NLCG.iters;
+its_imphase_BFGS    = his_imphase_BFGS.iters;
+its_imphasor_BFGS   = his_imphasor_BFGS.iters;
 its_imphase_GN      = his_imphase_GN.iters;
 its_imphasor_GN     = his_imphasor_GN.iters;
 its_imphase_PGN     = his_imphase_PGN.iters;
@@ -216,6 +248,8 @@ RE_imphase_GD       = zeros(size(its_imphase_GD,2),1);
 RE_imphasor_GD      = zeros(size(its_imphasor_GD,2),1);
 RE_imphase_NLCG     = zeros(size(its_imphase_NLCG,2),1);
 RE_imphasor_NLCG    = zeros(size(its_imphasor_NLCG,2),1);
+RE_imphase_BFGS     = zeros(size(its_imphase_BFGS,2),1);
+RE_imphasor_BFGS    = zeros(size(its_imphasor_BFGS,2),1);
 RE_imphase_GN       = zeros(size(its_imphase_GN,2),1);
 RE_imphasor_GN      = zeros(size(its_imphasor_GN,2),1);
 RE_imphase_PGN      = zeros(size(its_imphase_PGN,2),1);
@@ -237,6 +271,14 @@ end
 
 for j = 1:length(RE_imphasor_NLCG)
    RE_imphasor_NLCG(j) = norm((its_imphasor_NLCG(:,j)/max(its_imphasor_NLCG(:,j))) - obj(:))/norm(obj(:));  
+end
+
+for j = 1:length(RE_imphase_BFGS)
+   RE_imphase_BFGS(j) = norm((its_imphase_BFGS(:,j)/max(its_imphase_BFGS(:,j))) - obj(:))/norm(obj(:));  
+end
+
+for j = 1:length(RE_imphasor_BFGS)
+   RE_imphasor_BFGS(j) = norm((its_imphasor_BFGS(:,j)/max(its_imphasor_BFGS(:,j))) - obj(:))/norm(obj(:));  
 end
 
 for j = 1:length(RE_imphase_GN)
@@ -268,6 +310,8 @@ hold on;
 plot((0:length(RE_imphasor_GD)-1)' ,RE_imphasor_GD); 
 plot((0:length(RE_imphase_NLCG)-1)',RE_imphase_NLCG); 
 plot((0:length(RE_imphasor_NLCG)-1)' ,RE_imphasor_NLCG); 
+plot((0:length(RE_imphase_BFGS)-1)',RE_imphase_BFGS); 
+plot((0:length(RE_imphasor_BFGS)-1)' ,RE_imphasor_BFGS); 
 plot((0:length(RE_imphase_GN)-1)',RE_imphase_GN); 
 plot((0:length(RE_imphasor_GN)-1)' ,RE_imphasor_GN); 
 plot((0:length(RE_imphase_PGN)-1)' ,RE_imphase_PGN); 
@@ -275,9 +319,10 @@ plot((0:length(RE_imphasor_PGN)-1)',RE_imphasor_PGN);
 plot((0:length(RE_imphase_PGNR)-1)' ,RE_imphase_PGNR); 
 plot((0:length(RE_imphasor_PGNR)-1)',RE_imphasor_PGNR);
 leg = legend('E1-GD-pen.reg','E2-GD-pen.reg','E1-NLCG-pen.reg','E2-NLCG-pen.reg',...
-             'E1-GN-pen.reg', 'E2-GN-pen.reg.','E1-PGN','E2-PGN','E1-PGN-R','E2-PGN-R');
+             'E1-LBFGS-pen.reg','E2-LBFGS-pen.reg','E1-GN-pen.reg', 'E2-GN-pen.reg.',...
+             'E1-PGN','E2-PGN','E1-PGN-R','E2-PGN-R');
 leg.FontSize = 14;
-tit = title('RE: ||x-xtrue||^2/||xtrue||^2')
+tit = title('RE: $\frac{\|x-x_{true}\|^2}{\|x_{true}\|^2}$','interpreter','latex')
 tit.FontSize = 16;
 
 %%
@@ -286,6 +331,8 @@ its_imphase_GD      = his_imphase_GD.iters;
 its_imphasor_GD     = his_imphasor_GD.iters;
 its_imphase_NLCG    = his_imphase_NLCG.iters;
 its_imphasor_NLCG   = his_imphasor_NLCG.iters;
+its_imphase_BFGS    = his_imphase_BFGS.iters;
+its_imphasor_BFGS   = his_imphasor_BFGS.iters;
 its_imphase_GN      = his_imphase_GN.iters;
 its_imphasor_GN     = his_imphasor_GN.iters;
 its_imphase_PGN     = his_imphase_PGN.iters;
@@ -297,6 +344,8 @@ NCC_imphase_GD       = zeros(size(its_imphase_GD,2),1);
 NCC_imphasor_GD      = zeros(size(its_imphasor_GD,2),1);
 NCC_imphase_NLCG     = zeros(size(its_imphase_NLCG,2),1);
 NCC_imphasor_NLCG    = zeros(size(its_imphasor_NLCG,2),1);
+NCC_imphase_BFGS     = zeros(size(its_imphase_BFGS,2),1);
+NCC_imphasor_BFGS    = zeros(size(its_imphasor_BFGS,2),1);
 NCC_imphase_GN       = zeros(size(its_imphase_GN,2),1);
 NCC_imphasor_GN      = zeros(size(its_imphasor_GN,2),1);
 NCC_imphase_PGN      = zeros(size(its_imphase_PGN,2),1);
@@ -322,6 +371,16 @@ end
 for j = 1:length(NCC_imphasor_NLCG)
    im_act = its_imphasor_NLCG(:,j)/max(its_imphasor_NLCG(:,j));
    NCC_imphasor_NLCG(j) = 0.5 - 0.5*((im_act(:)'*obj(:))^2/((im_act(:)'*im_act(:))*(obj(:)'*obj(:))));  
+end
+
+for j = 1:length(NCC_imphase_BFGS)
+   im_act = its_imphase_BFGS(:,j)/max(its_imphase_BFGS(:,j));
+   NCC_imphase_BFGS(j) = 0.5 - 0.5*((im_act(:)'*obj(:))^2/((im_act(:)'*im_act(:))*(obj(:)'*obj(:))));  
+end
+
+for j = 1:length(NCC_imphasor_BFGS)
+   im_act = its_imphasor_BFGS(:,j)/max(its_imphasor_BFGS(:,j));
+   NCC_imphasor_BFGS(j) = 0.5 - 0.5*((im_act(:)'*obj(:))^2/((im_act(:)'*im_act(:))*(obj(:)'*obj(:))));  
 end
 
 for j = 1:length(NCC_imphase_GN)
@@ -360,6 +419,8 @@ hold on;
 plot((0:length(NCC_imphasor_GD)-1)' ,NCC_imphasor_GD); 
 plot((0:length(NCC_imphase_NLCG)-1)',NCC_imphase_NLCG); 
 plot((0:length(NCC_imphasor_NLCG)-1)' ,NCC_imphasor_NLCG);
+plot((0:length(NCC_imphase_BFGS)-1)',NCC_imphase_BFGS); 
+plot((0:length(NCC_imphasor_BFGS)-1)' ,NCC_imphasor_BFGS);
 plot((0:length(NCC_imphase_GN)-1)',NCC_imphase_GN); 
 plot((0:length(NCC_imphasor_GN)-1)' ,NCC_imphasor_GN); 
 plot((0:length(NCC_imphase_PGN)-1)' ,NCC_imphase_PGN); 
@@ -367,9 +428,10 @@ plot((0:length(NCC_imphasor_PGN)-1)',NCC_imphasor_PGN);
 plot((0:length(NCC_imphase_PGNR)-1)' ,NCC_imphase_PGNR); 
 plot((0:length(NCC_imphasor_PGNR)-1)',NCC_imphasor_PGNR);
 leg = legend('E1-GD-pen.reg','E2-GD-pen.reg','E1-NLCG-pen.reg','E2-NLCG-pen.reg',...
-             'E1-GN-pen.reg', 'E2-GN-pen.reg.','E1-PGN','E2-PGN','E1-PGN-R','E2-PGN-R');
+             'E1-LBFGS-pen.reg','E2-LBFGS-pen.reg','E1-GN-pen.reg', 'E2-GN-pen.reg.',...
+             'E1-PGN','E2-PGN','E1-PGN-R','E2-PGN-R');
 leg.FontSize = 14;
-tit = title('NCC: 0.5*(1 - <x,xtrue>^2/(||x||^2*||xtrue||^2)');
+tit = title('NCC:$\frac{1}{2} \left(1 - \frac{\langle x, x_{true}\rangle^2}{\|x\|^2 \|x_{true}\|^2} \right)$','interpreter','latex');
 tit.FontSize = 16;
 %%
 % Print some results to the terminal window
@@ -378,6 +440,8 @@ fprintf('min(RE_imphase_GD)     = %1.4e \n', min(RE_imphase_GD));
 fprintf('min(RE_imphasor_GD)    = %1.4e \n', min(RE_imphasor_GD));
 fprintf('min(RE_imphase_NLCG)   = %1.4e \n', min(RE_imphase_NLCG));
 fprintf('min(RE_imphasor_NLCG)  = %1.4e \n', min(RE_imphasor_NLCG));
+fprintf('min(RE_imphase_LBFGS)  = %1.4e \n', min(RE_imphase_BFGS));
+fprintf('min(RE_imphasor_LBFGS) = %1.4e \n', min(RE_imphasor_BFGS));
 fprintf('min(RE_imphase_GN)     = %1.4e \n', min(RE_imphase_GN));
 fprintf('min(RE_imphasor_GN)    = %1.4e \n', min(RE_imphasor_GN));
 fprintf('min(RE_imphase_PGN)    = %1.4e \n', min(RE_imphase_PGN));
@@ -390,6 +454,8 @@ fprintf('min(NCC_imphase_GD)    = %1.4e \n', min(NCC_imphase_GD));
 fprintf('min(NCC_imphasor_GD)   = %1.4e \n', min(NCC_imphasor_GD));
 fprintf('min(NCC_imphase_NLCG)  = %1.4e \n', min(NCC_imphase_NLCG));
 fprintf('min(NCC_imphasor_NLCG) = %1.4e \n', min(NCC_imphasor_NLCG));
+fprintf('min(NCC_imphase_LBFGS) = %1.4e \n', min(NCC_imphase_BFGS));
+fprintf('min(NCC_imphasor_LBFGS)= %1.4e \n', min(NCC_imphasor_BFGS));
 fprintf('min(NCC_imphase_GN)    = %1.4e \n', min(NCC_imphase_GN));
 fprintf('min(NCC_imphasor_GN)   = %1.4e \n', min(NCC_imphasor_GN));
 fprintf('min(NCC_imphase_PGN)   = %1.4e \n', min(NCC_imphase_PGN));
@@ -402,6 +468,8 @@ fprintf('time(imphase_GD)       = %1.4e \n', time_imphase_GD);
 fprintf('time(imphasor_GD)      = %1.4e \n', time_imphasor_GD);
 fprintf('time(imphase_NLCG)     = %1.4e \n', time_imphase_NLCG);
 fprintf('time(imphasor_NLCG)    = %1.4e \n', time_imphasor_NLCG);
+fprintf('time(imphase_LBFGS)    = %1.4e \n', time_imphase_BFGS);
+fprintf('time(imphasor_LBFGS)   = %1.4e \n', time_imphasor_BFGS);
 fprintf('time(imphase_GN)       = %1.4e \n', time_imphase_GN);
 fprintf('time(imphasor_GN)      = %1.4e \n', time_imphasor_GN);
 fprintf('time(imphase_PGN)      = %1.4e \n', time_imphase_PGN);
@@ -410,22 +478,26 @@ fprintf('time(imphase_PGNR)     = %1.4e \n', time_imphase_PGNR);
 fprintf('time(imphasor_PGNR)    = %1.4e \n', time_imphasor_PGNR);
 
 fprintf('\n***** Time per Iteration *****\n');
-fprintf('time(imphase_GD)/its   = %1.4e \n', time_imphase_GD/size(its_imphase_GD,2));
-fprintf('time(imphasor_GD)/its  = %1.4e \n', time_imphasor_GD/size(its_imphasor_GD,2));
-fprintf('time(imphase_NLCG)/its = %1.4e \n', time_imphase_NLCG/size(its_imphase_NLCG,2));
-fprintf('time(imphasor_NLCG)/its= %1.4e \n', time_imphasor_NLCG/size(its_imphasor_NLCG,2));
-fprintf('time(imphase_GN)/its   = %1.4e \n', time_imphase_GN/size(its_imphase_GN,2));
-fprintf('time(imphasor_GN)/its  = %1.4e \n', time_imphasor_GN/size(its_imphasor_GN,2));
-fprintf('time(imphase_PGN)/its  = %1.4e \n', time_imphase_PGN/size(its_imphase_PGN,2));
-fprintf('time(imphasor_PGN)/its = %1.4e \n', time_imphasor_PGN/size(its_imphasor_PGN,2));
-fprintf('time(imphase_PGNR)/its = %1.4e \n', time_imphase_PGNR/size(its_imphase_PGNR,2));
-fprintf('time(imphasor_PGNR)/its= %1.4e \n', time_imphasor_PGNR/size(its_imphasor_PGNR,2));
+fprintf('time(imphase_GD)/its    = %1.4e \n', time_imphase_GD/size(its_imphase_GD,2));
+fprintf('time(imphasor_GD)/its   = %1.4e \n', time_imphasor_GD/size(its_imphasor_GD,2));
+fprintf('time(imphase_NLCG)/its  = %1.4e \n', time_imphase_NLCG/size(its_imphase_NLCG,2));
+fprintf('time(imphasor_NLCG)/its = %1.4e \n', time_imphasor_NLCG/size(its_imphasor_NLCG,2));
+fprintf('time(imphase_LBFGS)/its = %1.4e \n', time_imphase_BFGS/size(its_imphase_BFGS,2));
+fprintf('time(imphasor_LBFGS)/its= %1.4e \n', time_imphasor_BFGS/size(its_imphasor_BFGS,2));
+fprintf('time(imphase_GN)/its    = %1.4e \n', time_imphase_GN/size(its_imphase_GN,2));
+fprintf('time(imphasor_GN)/its   = %1.4e \n', time_imphasor_GN/size(its_imphasor_GN,2));
+fprintf('time(imphase_PGN)/its   = %1.4e \n', time_imphase_PGN/size(its_imphase_PGN,2));
+fprintf('time(imphasor_PGN)/its  = %1.4e \n', time_imphasor_PGN/size(its_imphasor_PGN,2));
+fprintf('time(imphase_PGNR)/its  = %1.4e \n', time_imphase_PGNR/size(its_imphase_PGNR,2));
+fprintf('time(imphasor_PGNR)/its = %1.4e \n', time_imphasor_PGNR/size(its_imphasor_PGNR,2));
 
 fprintf('\n***** Outer Iterations til Convergence *****\n');
 fprintf('iters(imphase_GD)      = %d \n', size(its_imphase_GD,2)-1);
 fprintf('iters(imphasor_GD)     = %d \n', size(its_imphasor_GD,2)-1);
 fprintf('iters(imphase_NLCG)    = %d \n', size(its_imphase_NLCG,2)-1);
 fprintf('iters(imphasor_NLCG)   = %d \n', size(its_imphasor_NLCG,2)-1);
+fprintf('iters(imphase_LBFGS)   = %d \n', size(its_imphase_BFGS,2)-1);
+fprintf('iters(imphasor_LBFGS)  = %d \n', size(its_imphasor_BFGS,2)-1);
 fprintf('iters(imphase_GN)      = %d \n', size(its_imphase_GN,2)-1);
 fprintf('iters(imphasor_GN)     = %d \n', size(its_imphasor_GN,2)-1);
 fprintf('iters(imphase_PGN)     = %d \n', size(its_imphase_PGN,2)-1);
@@ -438,6 +510,8 @@ fprintf('LS(imphase_GD)/its     = %1.1f \n', sum(his_imphase_GD.array(:,6)/(size
 fprintf('LS(imphasor_GD)/its    = %1.1f \n', sum(his_imphasor_GD.array(:,6)/(size(its_imphasor_GD,2)-1)));
 fprintf('LS(imphase_NLCG)/its   = %1.1f \n', sum(his_imphase_NLCG.array(:,5)/(size(its_imphase_NLCG,2)-1)));
 fprintf('LS(imphasor_NLCG)/its  = %1.1f \n', sum(his_imphasor_NLCG.array(:,5)/(size(its_imphasor_NLCG,2)-1)));
+fprintf('LS(imphase_LBFGS)/its  = %1.1f \n', sum(his_imphase_BFGS.array(:,5)/(size(its_imphase_BFGS,2)-1)));
+fprintf('LS(imphasor_LBFGS)/its = %1.1f \n', sum(his_imphasor_BFGS.array(:,5)/(size(its_imphasor_BFGS,2)-1)));
 fprintf('LS(imphase_GN)/its     = %1.1f \n', sum(his_imphase_GN.array(:,6)/(size(its_imphase_GN,2)-1)));
 fprintf('LS(imphasor_GN)/its    = %1.1f \n', sum(his_imphasor_GN.array(:,6)/(size(its_imphasor_GN,2)-1)));
 fprintf('LS(imphase_PGN)/its    = %1.1f \n', sum(his_imphase_PGN.array(:,6)/(size(its_imphase_PGN,2)-1)));
