@@ -2,8 +2,9 @@ function [yc,his] = NLCG(fctn, y0, varargin)
 %
 % function [yc,his] = NLCG(fctn,y0,varargin)
 %
-% Nonlinear conjugate gradient with armijo line search for minimizing 
-% J = fctn(yc)
+% Nonlinear conjugate gradient with armijo line search for minimizing:
+% 
+%                           J = fctn(yc)
 % 
 % Input:
 %   fctn      - function handle

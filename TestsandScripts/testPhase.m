@@ -274,73 +274,109 @@ RE_phasor_GNI     = zeros(size(its_phasor_GNI,3),1);
 for j = 1:length(RE_phase_GD)
    active_ph  = phase_foldout(its_phase_GD(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
+   active_im  = active_im/max(active_im(:));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
    RE_phase_GD(j) = norm(((active_im(:)/max(active_im(:))) - obj(:))/norm(obj(:)));  
 end
 
 for j = 1:length(RE_phasor_GD)
    active_ph  = phase_foldout(its_phasor_GD(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
-   RE_phasor_GD(j) = norm(((active_im(:)/max(active_im(:))) - obj(:))/norm(obj(:)));
+   active_im  = active_im/max(active_im(:));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
+   RE_phasor_GD(j) = norm((active_im(:) - obj(:))/norm(obj(:)));
 end
 
 for j = 1:length(RE_phase_NLCG)
    active_ph  = phase_foldout(its_phase_NLCG(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
-   RE_phase_NLCG(j) = norm(((active_im(:)/max(active_im(:))) - obj(:))/norm(obj(:)));
+   active_im  = active_im/max(active_im(:));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
+   RE_phase_NLCG(j) = norm((active_im(:) - obj(:))/norm(obj(:)));
 end
 
 for j = 1:length(RE_phasor_NLCG)
    active_ph  = phase_foldout(its_phasor_NLCG(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
-   RE_phasor_NLCG(j) = norm(((active_im(:)/max(active_im(:))) - obj(:))/norm(obj(:)));
+   active_im  = active_im/max(active_im(:));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
+   RE_phasor_NLCG(j) = norm((active_im(:) - obj(:))/norm(obj(:)));
 end
 
 for j = 1:length(RE_phase_BFGS)
    active_ph  = phase_foldout(its_phase_BFGS(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
-   RE_phase_BFGS(j) = norm(((active_im(:)/max(active_im(:))) - obj(:))/norm(obj(:)));
+   active_im  = active_im/max(active_im(:));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
+   RE_phase_BFGS(j) = norm((active_im(:) - obj(:))/norm(obj(:)));
 end
 
 for j = 1:length(RE_phasor_BFGS)
    active_ph  = phase_foldout(its_phasor_BFGS(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
-   RE_phasor_BFGS(j) = norm(((active_im(:)/max(active_im(:))) - obj(:))/norm(obj(:)));
+   active_im  = active_im/max(active_im(:));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
+   RE_phasor_BFGS(j) = norm((active_im(:) - obj(:))/norm(obj(:)));
 end
 
 for j = 1:length(RE_phase_GNF)
    active_ph  = phase_foldout(its_phase_GNF(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
-   RE_phase_GNF(j) = norm(((active_im(:)/max(active_im(:))) - obj(:))/norm(obj(:)));
+   active_im  = active_im/max(active_im(:));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
+   RE_phase_GNF(j) = norm((active_im(:) - obj(:))/norm(obj(:)));
 end
 
 for j = 1:length(RE_phasor_GNF)
    active_ph  = phase_foldout(its_phasor_GNF(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
-   RE_phasor_GNF(j) = norm(((active_im(:)/max(active_im(:))) - obj(:))/norm(obj(:)));
+   active_im  = active_im/max(active_im(:));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
+   RE_phasor_GNF(j) = norm((active_im(:) - obj(:))/norm(obj(:)));
 end
 
 for j = 1:length(RE_phase_GNT)
    active_ph  = phase_foldout(its_phase_GNT(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
-   RE_phase_GNT(j) = norm(((active_im(:)/max(active_im(:))) - obj(:))/norm(obj(:)));
+   active_im  = active_im/max(active_im(:));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
+   RE_phase_GNT(j) = norm((active_im(:) - obj(:))/norm(obj(:)));
 end
 
 for j = 1:length(RE_phasor_GNT)
    active_ph  = phase_foldout(its_phasor_GNT(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
-   RE_phasor_GNT(j) = norm(((active_im(:)/max(active_im(:))) - obj(:))/norm(obj(:)));
+   active_im  = active_im/max(active_im(:));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
+   RE_phasor_GNT(j) = norm((active_im(:) - obj(:))/norm(obj(:)));
 end
 
 for j = 1:length(RE_phase_GNI)
    active_ph  = phase_foldout(its_phase_GNI(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
-   RE_phase_GNI(j) = norm(((active_im(:)/max(active_im(:))) - obj(:))/norm(obj(:)));
+   active_im  = active_im/max(active_im(:));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
+   RE_phase_GNI(j) = norm((active_im(:) - obj(:))/norm(obj(:)));
 end
 
 for j = 1:length(RE_phasor_GNI)
    active_ph  = phase_foldout(its_phasor_GNI(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
-   RE_phasor_GNI(j) = norm(((active_im(:)/max(active_im(:))) - obj(:))/norm(obj(:)));
+   active_im  = active_im/max(active_im(:));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
+   RE_phasor_GNI(j) = norm((active_im(:) - obj(:))/norm(obj(:)));
 end
 
 clear active_ph active_im;
@@ -396,6 +432,8 @@ NCC_phasor_GNI    = zeros(size(its_phasor_GNI,3),1);
 for j = 1:length(NCC_phase_GD)
    active_ph  = phase_foldout(its_phase_GD(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
    active_im  = active_im(:)/max(active_im(:));
    NCC_phase_GD(j) = 0.5 - 0.5*((active_im(:)'*obj(:))^2/((active_im(:)'*active_im(:))*(obj(:)'*obj(:))));  
 end
@@ -403,6 +441,8 @@ end
 for j = 1:length(NCC_phasor_GD)
    active_ph  = phase_foldout(its_phasor_GD(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
    active_im  = active_im(:)/max(active_im(:));
    NCC_phasor_GD(j) = 0.5 - 0.5*((active_im(:)'*obj(:))^2/((active_im(:)'*active_im(:))*(obj(:)'*obj(:))));  
 end
@@ -410,6 +450,8 @@ end
 for j = 1:length(NCC_phase_NLCG)
    active_ph  = phase_foldout(its_phase_NLCG(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
    active_im  = active_im(:)/max(active_im(:));
    NCC_phase_NLCG(j) = 0.5 - 0.5*((active_im(:)'*obj(:))^2/((active_im(:)'*active_im(:))*(obj(:)'*obj(:))));  
 end
@@ -417,6 +459,8 @@ end
 for j = 1:length(NCC_phasor_NLCG)
    active_ph  = phase_foldout(its_phasor_NLCG(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
    active_im  = active_im(:)/max(active_im(:));
    NCC_phasor_NLCG(j) = 0.5 - 0.5*((active_im(:)'*obj(:))^2/((active_im(:)'*active_im(:))*(obj(:)'*obj(:))));  
 end
@@ -424,6 +468,8 @@ end
 for j = 1:length(NCC_phase_BFGS)
    active_ph  = phase_foldout(its_phase_BFGS(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
    active_im  = active_im(:)/max(active_im(:));
    NCC_phase_BFGS(j) = 0.5 - 0.5*((active_im(:)'*obj(:))^2/((active_im(:)'*active_im(:))*(obj(:)'*obj(:))));  
 end
@@ -431,6 +477,8 @@ end
 for j = 1:length(NCC_phasor_BFGS)
    active_ph  = phase_foldout(its_phasor_BFGS(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
    active_im  = active_im(:)/max(active_im(:));
    NCC_phasor_BFGS(j) = 0.5 - 0.5*((active_im(:)'*obj(:))^2/((active_im(:)'*active_im(:))*(obj(:)'*obj(:))));  
 end
@@ -438,6 +486,8 @@ end
 for j = 1:length(NCC_phase_GNF)
    active_ph  = phase_foldout(its_phase_GNF(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
    active_im  = active_im(:)/max(active_im(:));
    NCC_phase_GNF(j) = 0.5 - 0.5*((active_im(:)'*obj(:))^2/((active_im(:)'*active_im(:))*(obj(:)'*obj(:))));  
 end
@@ -445,6 +495,8 @@ end
 for j = 1:length(NCC_phasor_GNF)
    active_ph  = phase_foldout(its_phasor_GNF(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
    active_im  = active_im(:)/max(active_im(:));
    NCC_phasor_GNF(j) = 0.5 - 0.5*((active_im(:)'*obj(:))^2/((active_im(:)'*active_im(:))*(obj(:)'*obj(:))));  
 end
@@ -452,6 +504,8 @@ end
 for j = 1:length(NCC_phase_GNT)
    active_ph  = phase_foldout(its_phase_GNT(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
    active_im  = active_im(:)/max(active_im(:));
    NCC_phase_GNT(j) = 0.5 - 0.5*((active_im(:)'*obj(:))^2/((active_im(:)'*active_im(:))*(obj(:)'*obj(:))));  
 end
@@ -459,6 +513,8 @@ end
 for j = 1:length(NCC_phasor_GNT)
    active_ph  = phase_foldout(its_phasor_GNT(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
    active_im  = active_im(:)/max(active_im(:));
    NCC_phasor_GNT(j) = 0.5 - 0.5*((active_im(:)'*obj(:))^2/((active_im(:)'*active_im(:))*(obj(:)'*obj(:))));  
 end
@@ -466,6 +522,8 @@ end
 for j = 1:length(NCC_phase_GNI)
    active_ph  = phase_foldout(its_phase_GNI(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
    active_im  = active_im(:)/max(active_im(:));
    NCC_phase_GNI(j) = 0.5 - 0.5*((active_im(:)'*obj(:))^2/((active_im(:)'*active_im(:))*(obj(:)'*obj(:))));  
 end
@@ -473,6 +531,8 @@ end
 for j = 1:length(NCC_phasor_GNI)
    active_ph  = phase_foldout(its_phasor_GNI(:,:,j), 0);
    active_im  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*active_ph(:)),[256 256])))));
+   s = measureShift(obj,active_im);
+   active_im  = shiftImage(active_im,s);
    active_im  = active_im(:)/max(active_im(:));
    NCC_phasor_GNI(j) = 0.5 - 0.5*((active_im(:)'*obj(:))^2/((active_im(:)'*active_im(:))*(obj(:)'*obj(:))));  
 end

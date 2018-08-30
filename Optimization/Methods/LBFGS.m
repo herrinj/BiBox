@@ -2,9 +2,10 @@ function [yc,his] = LBFGS(fctn, y0, varargin)
 %
 % function [yc,his] = LBFGS(fctn,y0,varargin)
 %
-% Limited memory Broyden Fletcher Goldfarb Shanno algorithm
-% with armijo line search for minimizing 
-% J = fctn(yc)
+% Limited memory Broyden Fletcher Goldfarb Shanno (L-BFGS) algorithm
+% with Armijo line search for minimizing: 
+% 
+%                           J = fctn(yc)
 % 
 % Input:
 %   fctn      - function handle
@@ -67,7 +68,6 @@ yc      = y0;
 sk      = [];
 yk      = [];
 rhok    = [];
-gammak  = [];
 [Jc,para,dJ] = fctn(yc); 
 Plots('start',para);
 iter = 0; yOld = 0*yc; Jold = Jc; dy = 0*yc;
@@ -105,7 +105,7 @@ while 1
     iter = iter+1;  
     
     % Step direction
-    dy = -stepLBFGS(dJ,sk,yk,rhok,gammak,stepHis);
+    dy = -stepLBFGS(dJ,sk,yk,rhok,stepHis);
     
     % Line search
     [yt, exitFlag, lsIter] = lineSearch(fctn, yc, dy, Jc, dJ, lsMaxIter, lsReduction); 
@@ -121,7 +121,6 @@ while 1
         sk      = [yc - yOld, sk(:,1:min(stepHis-1,iter-1))];
         yk      = [dJ(:) - dJold(:), yk(:,1:min(stepHis-1,iter-1))];      
         rhok    = [1/(sk(:,1)'*yk(:,1)); rhok(1:min(stepHis-1,iter-1))];
-        gammak  = (sk(:,1)'*yk(:,1))/(yk(:,1)'*yk(:,1));
     end
     
     % Some output
@@ -169,7 +168,7 @@ end
     
 end
 
-function dy = stepLBFGS(dJ,sk,yk,rhok,gammak,stepHis)
+function dy = stepLBFGS(dJ,sk,yk,rhok,stepHis)
 %
 %   Computes limited memory BFGS step using two loop recursion
 %
@@ -177,7 +176,6 @@ function dy = stepLBFGS(dJ,sk,yk,rhok,gammak,stepHis)
 %           sk - set of sk vectors
 %           yk - set of yk vectors
 %         rhok - set of rhok constants
-%       gammak - weight for H0 matrix
 %      stepHis - number of vectors in LBFGS history
 %
 %   Output: dy - computed LBFGS step 
@@ -189,7 +187,7 @@ if isempty(sk)
 end
 
 [n,m]   = size(yk);
-H0      = speye(n); % gammak*speye(n) 
+H0      = speye(n); % gammak*speye(n)?
 alphak  = zeros(stepHis,1);
 dy      = dJ(:);
 
@@ -226,7 +224,7 @@ function [yt, exitFlag, iter] = armijo(fctn, yc, dy, Jc, dJ, lsMaxIter, lsReduct
 %
 persistent t;
 if isempty(t)
-    t = 1; % initial step 1 for Gauss-Newton
+    t = 1; % Initial step 1 for Gauss-Newton
 end
 iter = 1;
 cond = zeros(2,1);
@@ -235,13 +233,13 @@ while 1
     yt = yc + t*dy;
     Jt = fctn(yt);
     
-    % check Armijo condition
+    % Check Armijo condition
     cond(1) = (Jt<Jc + t*lsReduction*(reshape(dJ,1,[])*dy));
     cond(2) = (iter >=lsMaxIter);
     
     if cond(1)
         if (iter==1)
-            t = 2*t;
+            t = 2*t; % For maximum length step, try 2x next iteration
         end
         exitFlag = 1;
         break; 
@@ -252,7 +250,7 @@ while 1
         break;
     end
         
-    t = t/2; % sterp reduction factor
+    t = t/2; % Step reduction factor
     iter = iter+1;
 end
 end

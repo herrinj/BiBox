@@ -6,7 +6,7 @@ clear all; close all;
 
 % Setup data
 path_SpeckleImagingCodes;
-[nfr, D_r0, image_name, K_n, sigma_rn] = setupBispectrumParams('nfr',50,'D_r0',30);
+[nfr, D_r0, image_name, K_n, sigma_rn] = setupBispectrumParams('nfr',100,'D_r0',30);
 setupBispectrumData;
 image_recur = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*phase_recur(:)),[256 256])))));
 dims = size(image_recur);
@@ -22,10 +22,12 @@ tolG         = 1e1;
 maxIter      = 50;
 solverMaxIter= 250;              
 solverTol    = 1e-1;
+alphaPos     = 1e4;
+alphaGrad    = 1e-2;
 
 %%
 % Run gradient descent for imphase
-fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', 100.0,'regularizer','pos');
+fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaPos,'regularizer','pos');
 tic();
 [imphase_GD, his_imphase_GD] = GradientDescentProj(fctn, image_recur(:),...
                                                 'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -36,7 +38,7 @@ clear GradientDescentProj;
 clear imphaseObjFctn;
 
 % Run gradient descent for imphasor
-fctn = @(x) imphasorObjFctn(x,A, bispec_phase,dims, pupil_mask,'alpha',100.0,'regularizer','pos');
+fctn = @(x) imphasorObjFctn(x,A, bispec_phase,dims, pupil_mask,'alpha',alphaPos,'regularizer','pos');
 tic();
 [imphasor_GD, his_imphasor_GD] = GradientDescentProj(fctn, image_recur(:),...
                                                 'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -48,7 +50,7 @@ clear imphasorObjFctn;
 
 %%
 % Run NLCG for imphase
-fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', 100.0,'regularizer','pos');
+fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaPos,'regularizer','pos');
 tic();
 [imphase_NLCG, his_imphase_NLCG] = NonlinearCG(fctn, image_recur(:), 'maxIter',maxIter,...
                                         'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -59,7 +61,7 @@ clear NonlinearCG;
 clear imphaseObjFctn;
 
 % Run NLCG for imphasor
-fctn = @(x) imphasorObjFctn(x,A, bispec_phase,dims, pupil_mask,'alpha',100.0,'regularizer','pos');
+fctn = @(x) imphasorObjFctn(x,A, bispec_phase,dims, pupil_mask,'alpha',alphaPos,'regularizer','pos');
 tic();
 [imphasor_NLCG, his_imphasor_NLCG] = NonlinearCG(fctn, image_recur(:),'maxIter',maxIter,...
                                           'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -70,8 +72,8 @@ clear NonlinearCG;
 clear imphasorObjFctn;
 
 %%
-% Run NLCG for imphase
-fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', 100.0,'regularizer','pos');
+% Run LBFGS for imphase
+fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaPos,'regularizer','pos');
 tic();
 [imphase_BFGS, his_imphase_BFGS] = LBFGS(fctn, image_recur(:), 'maxIter',maxIter,...
                                         'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -81,8 +83,8 @@ imphase_BFGS = reshape(imphase_BFGS,[256 256]);
 clear LBFGS;
 clear imphaseObjFctn;
 
-% Run NLCG for imphasor
-fctn = @(x) imphasorObjFctn(x,A, bispec_phase,dims, pupil_mask,'alpha',100.0,'regularizer','pos');
+% Run LBFGS for imphasor
+fctn = @(x) imphasorObjFctn(x,A, bispec_phase,dims, pupil_mask,'alpha',alphaPos,'regularizer','pos');
 tic();
 [imphasor_BFGS, his_imphasor_BFGS] = LBFGS(fctn, image_recur(:),'maxIter',maxIter,...
                                           'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -94,7 +96,7 @@ clear imphasorObjFctn;
 
 %%
 % Run Gauss-Newton for imphase
-fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', 100.0,'regularizer','pos');
+fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaPos,'regularizer','pos');
 tic();
 [imphase_GN, his_imphase_GN] = GaussNewtonProj(fctn, image_recur(:),...
                                                 'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -106,7 +108,7 @@ clear GaussNewtonProj;
 clear imphaseObjFctn;
 
 % Run Gauss-Newton for imphasor
-fctn = @(x) imphasorObjFctn(x,A, bispec_phase,dims, pupil_mask,'alpha',100.0,'regularizer','pos');
+fctn = @(x) imphasorObjFctn(x,A, bispec_phase,dims, pupil_mask,'alpha',alphaPos,'regularizer','pos');
 tic();
 [imphasor_GN, his_imphasor_GN] = GaussNewtonProj(fctn, image_recur(:),...
                                                 'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -144,7 +146,7 @@ clear imphasorObjFctn;
 
 %%
 % Run projected Gauss-Newton for imphase
-fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', 0.001,'regularizer','grad');
+fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaGrad,'regularizer','grad');
 tic();
 [imphase_PGNR, his_imphase_PGNR] = GaussNewtonProj(fctn, image_proj(:),...
                                                 'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -156,7 +158,7 @@ clear GaussNewtonProj;
 clear imphaseObjFctn;
 
 % Run projected Gauss-Newton for imphasor
-fctn = @(x) imphasorObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', 0.001,'regularizer','grad');
+fctn = @(x) imphasorObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaGrad,'regularizer','grad');
 tic();
 [imphasor_PGNR, his_imphasor_PGNR] = GaussNewtonProj(fctn, image_proj(:),...
                                                   'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -229,20 +231,98 @@ leg = legend('E1-GD-pen.reg','E2-GD-pen.reg','E1-NLCG-pen.reg','E2-NLCG-pen.reg'
 leg.FontSize = 14;
 tit = title('Rel. Obj. Func: $\frac{\|J\|}{\|J(0)\|}$','interpreter','latex');
 tit.FontSize = 16;
+
+%%
+% Correct shifts
+
+its_imphase_GD      = reshape(his_imphase_GD.iters, 256, 256, []);
+its_imphasor_GD     = reshape(his_imphasor_GD.iters, 256, 256, []);
+its_imphase_NLCG    = reshape(his_imphase_NLCG.iters, 256, 256, []);
+its_imphasor_NLCG   = reshape(his_imphasor_NLCG.iters, 256, 256, []);
+its_imphase_BFGS    = reshape(his_imphase_BFGS.iters, 256, 256, []);
+its_imphasor_BFGS   = reshape(his_imphasor_BFGS.iters, 256, 256, []);
+its_imphase_GN      = reshape(his_imphase_GN.iters, 256, 256, []);
+its_imphasor_GN     = reshape(his_imphasor_GN.iters, 256, 256, []);
+its_imphase_PGN     = reshape(his_imphase_PGN.iters, 256, 256, []);
+its_imphasor_PGN    = reshape(his_imphasor_PGN.iters, 256, 256, []);
+its_imphase_PGNR    = reshape(his_imphase_PGNR.iters, 256, 256, []);
+its_imphasor_PGNR   = reshape(his_imphasor_PGNR.iters, 256, 256, []);
+
+for j = 1:size(its_imphase_GD,3)
+    s = measureShift(obj,its_imphase_GD(:,:,j));
+    its_imphase_GD(:,:,j) = shiftImage(its_imphase_GD(:,:,j),s);
+end
+
+for j = 1:size(its_imphasor_GD,3)
+    s = measureShift(obj,its_imphasor_GD(:,:,j));
+    its_imphasor_GD(:,:,j) = shiftImage(its_imphasor_GD(:,:,j),s);
+end
+
+for j = 1:size(its_imphase_NLCG,3)
+    s = measureShift(obj,its_imphase_NLCG(:,:,j));
+    its_imphase_NLCG(:,:,j) = shiftImage(its_imphase_NLCG(:,:,j),s);
+end
+
+for j = 1:size(its_imphasor_NLCG,3)
+    s = measureShift(obj,its_imphasor_NLCG(:,:,j));
+    its_imphasor_NLCG(:,:,j) = shiftImage(its_imphasor_NLCG(:,:,j),s);
+end
+
+for j = 1:size(its_imphase_BFGS,3)
+    s = measureShift(obj,its_imphase_BFGS(:,:,j));
+    its_imphase_BFGS(:,:,j) = shiftImage(its_imphase_BFGS(:,:,j),s);
+end
+
+for j = 1:size(its_imphasor_BFGS,3)
+    s = measureShift(obj,its_imphasor_BFGS(:,:,j));
+    its_imphasor_BFGS(:,:,j) = shiftImage(its_imphasor_BFGS(:,:,j),s);
+end
+
+for j = 1:size(its_imphase_GN,3)
+    s = measureShift(obj,its_imphase_GN(:,:,j));
+    its_imphase_GN(:,:,j) = shiftImage(its_imphase_GN(:,:,j),s);
+end
+
+for j = 1:size(its_imphasor_GN,3)
+    s = measureShift(obj,its_imphasor_GN(:,:,j));
+    its_imphasor_GN(:,:,j) = shiftImage(its_imphasor_GN(:,:,j),s);
+end
+
+for j = 1:size(its_imphase_PGN,3)
+    s = measureShift(obj,its_imphase_PGN(:,:,j));
+    its_imphase_PGN(:,:,j) = shiftImage(its_imphase_PGN(:,:,j),s);
+end
+
+for j = 1:size(its_imphasor_PGN,3)
+    s = measureShift(obj,its_imphasor_PGN(:,:,j));
+    its_imphasor_PGN(:,:,j) = shiftImage(its_imphasor_PGN(:,:,j),s);
+end
+
+for j = 1:size(its_imphase_PGNR,3)
+    s = measureShift(obj,its_imphase_PGNR(:,:,j));
+    its_imphase_PGNR(:,:,j) = shiftImage(its_imphase_PGNR(:,:,j),s);
+end
+
+for j = 1:size(its_imphasor_PGNR,3)
+    s = measureShift(obj,its_imphasor_PGNR(:,:,j));
+    its_imphasor_PGNR(:,:,j) = shiftImage(its_imphasor_PGNR(:,:,j),s);
+end
+
+its_imphase_GD      = reshape(its_imphase_GD,[], size(its_imphase_GD,3));
+its_imphasor_GD     = reshape(its_imphasor_GD,[], size(its_imphasor_GD,3));
+its_imphase_NLCG    = reshape(its_imphase_NLCG,[], size(its_imphase_NLCG,3));
+its_imphasor_NLCG   = reshape(its_imphasor_NLCG,[], size(its_imphasor_NLCG,3));
+its_imphase_BFGS    = reshape(its_imphase_BFGS,[], size(its_imphase_BFGS,3));
+its_imphasor_BFGS   = reshape(its_imphasor_BFGS,[], size(its_imphasor_BFGS,3));
+its_imphase_GN      = reshape(its_imphase_GN,[], size(its_imphase_GN,3));
+its_imphasor_GN     = reshape(its_imphasor_GN,[], size(its_imphasor_GN,3));
+its_imphase_PGN     = reshape(its_imphase_PGN,[], size(its_imphase_PGN,3));
+its_imphasor_PGN    = reshape(its_imphasor_PGN,[], size(its_imphasor_PGN,3));
+its_imphase_PGNR    = reshape(its_imphase_PGNR,[], size(its_imphase_PGNR,3));
+its_imphasor_PGNR   = reshape(its_imphasor_PGNR,[], size(its_imphasor_PGNR,3));
+    
 %%
 % Relative error plots
-its_imphase_GD      = his_imphase_GD.iters;
-its_imphasor_GD     = his_imphasor_GD.iters;
-its_imphase_NLCG    = his_imphase_NLCG.iters;
-its_imphasor_NLCG   = his_imphasor_NLCG.iters;
-its_imphase_BFGS    = his_imphase_BFGS.iters;
-its_imphasor_BFGS   = his_imphasor_BFGS.iters;
-its_imphase_GN      = his_imphase_GN.iters;
-its_imphasor_GN     = his_imphasor_GN.iters;
-its_imphase_PGN     = his_imphase_PGN.iters;
-its_imphasor_PGN    = his_imphasor_PGN.iters;
-its_imphase_PGNR    = his_imphase_PGNR.iters;
-its_imphasor_PGNR   = his_imphasor_PGNR.iters;
 
 RE_imphase_GD       = zeros(size(its_imphase_GD,2),1);
 RE_imphasor_GD      = zeros(size(its_imphasor_GD,2),1);
@@ -322,7 +402,7 @@ leg = legend('E1-GD-pen.reg','E2-GD-pen.reg','E1-NLCG-pen.reg','E2-NLCG-pen.reg'
              'E1-LBFGS-pen.reg','E2-LBFGS-pen.reg','E1-GN-pen.reg', 'E2-GN-pen.reg.',...
              'E1-PGN','E2-PGN','E1-PGN-R','E2-PGN-R');
 leg.FontSize = 14;
-tit = title('RE: $\frac{\|x-x_{true}\|^2}{\|x_{true}\|^2}$','interpreter','latex')
+tit = title('RE: $\frac{\|x-x_{true}\|^2}{\|x_{true}\|^2}$','interpreter','latex');
 tit.FontSize = 16;
 
 %%
