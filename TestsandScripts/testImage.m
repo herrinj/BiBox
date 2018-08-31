@@ -17,17 +17,17 @@ avg_data_frame = sum(data,3)/size(data,3); avg_data_frame = avg_data_frame/max(a
 upper_bound = ones(numel(image_proj),1);
 lower_bound = zeros(numel(image_proj),1);
 tolJ         = 1e-4;            
-tolY         = 1e-4;           
+tolY         = 1e-3;           
 tolG         = 1e1;
-maxIter      = 50;
+maxIter      = 100;
 solverMaxIter= 250;              
 solverTol    = 1e-1;
-alphaPos     = 1e4;
+alphaPos     = 1e5;
 alphaGrad    = 1e-2;
 
 %%
 % Run gradient descent for imphase
-fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaPos,'regularizer','pos');
+fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaPos,'regularizer','pos','weights',weights);
 tic();
 [imphase_GD, his_imphase_GD] = GradientDescentProj(fctn, image_recur(:),...
                                                 'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -38,7 +38,7 @@ clear GradientDescentProj;
 clear imphaseObjFctn;
 
 % Run gradient descent for imphasor
-fctn = @(x) imphasorObjFctn(x,A, bispec_phase,dims, pupil_mask,'alpha',alphaPos,'regularizer','pos');
+fctn = @(x) imphasorObjFctn(x,A, bispec_phase,dims, pupil_mask,'alpha',alphaPos,'regularizer','pos','weights',weights);
 tic();
 [imphasor_GD, his_imphasor_GD] = GradientDescentProj(fctn, image_recur(:),...
                                                 'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -50,7 +50,7 @@ clear imphasorObjFctn;
 
 %%
 % Run NLCG for imphase
-fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaPos,'regularizer','pos');
+fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaPos,'regularizer','pos','weights',weights);
 tic();
 [imphase_NLCG, his_imphase_NLCG] = NonlinearCG(fctn, image_recur(:), 'maxIter',maxIter,...
                                         'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -61,7 +61,7 @@ clear NonlinearCG;
 clear imphaseObjFctn;
 
 % Run NLCG for imphasor
-fctn = @(x) imphasorObjFctn(x,A, bispec_phase,dims, pupil_mask,'alpha',alphaPos,'regularizer','pos');
+fctn = @(x) imphasorObjFctn(x,A, bispec_phase,dims, pupil_mask,'alpha',alphaPos,'regularizer','pos','weights',weights);
 tic();
 [imphasor_NLCG, his_imphasor_NLCG] = NonlinearCG(fctn, image_recur(:),'maxIter',maxIter,...
                                           'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -73,7 +73,7 @@ clear imphasorObjFctn;
 
 %%
 % Run LBFGS for imphase
-fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaPos,'regularizer','pos');
+fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaPos,'regularizer','pos','weights',weights);
 tic();
 [imphase_BFGS, his_imphase_BFGS] = LBFGS(fctn, image_recur(:), 'maxIter',maxIter,...
                                         'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -84,7 +84,7 @@ clear LBFGS;
 clear imphaseObjFctn;
 
 % Run LBFGS for imphasor
-fctn = @(x) imphasorObjFctn(x,A, bispec_phase,dims, pupil_mask,'alpha',alphaPos,'regularizer','pos');
+fctn = @(x) imphasorObjFctn(x,A, bispec_phase,dims, pupil_mask,'alpha',alphaPos,'regularizer','pos','weights',weights);
 tic();
 [imphasor_BFGS, his_imphasor_BFGS] = LBFGS(fctn, image_recur(:),'maxIter',maxIter,...
                                           'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -96,7 +96,7 @@ clear imphasorObjFctn;
 
 %%
 % Run Gauss-Newton for imphase
-fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaPos,'regularizer','pos');
+fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaPos,'regularizer','pos','weights',weights);
 tic();
 [imphase_GN, his_imphase_GN] = GaussNewtonProj(fctn, image_recur(:),...
                                                 'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -108,7 +108,7 @@ clear GaussNewtonProj;
 clear imphaseObjFctn;
 
 % Run Gauss-Newton for imphasor
-fctn = @(x) imphasorObjFctn(x,A, bispec_phase,dims, pupil_mask,'alpha',alphaPos,'regularizer','pos');
+fctn = @(x) imphasorObjFctn(x,A, bispec_phase,dims, pupil_mask,'alpha',alphaPos,'regularizer','pos','weights',weights);
 tic();
 [imphasor_GN, his_imphasor_GN] = GaussNewtonProj(fctn, image_recur(:),...
                                                 'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -121,7 +121,7 @@ clear imphasorObjFctn;
 
 %%
 % Run projected Gauss-Newton for imphase
-fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', 0.0,'regularizer','pos');
+fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', 0.0,'regularizer','pos','weights',weights);
 tic();
 [imphase_PGN, his_imphase_PGN] = GaussNewtonProj(fctn, image_proj(:),...
                                                 'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -133,7 +133,7 @@ clear GaussNewtonProj;
 clear imphaseObjFctn;
 
 % Run projected Gauss-Newton for imphasor
-fctn = @(x) imphasorObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', 0.0,'regularizer','pos');
+fctn = @(x) imphasorObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', 0.0,'regularizer','pos','weights',weights);
 tic();
 [imphasor_PGN, his_imphasor_PGN] = GaussNewtonProj(fctn, image_proj(:),...
                                                   'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -146,7 +146,7 @@ clear imphasorObjFctn;
 
 %%
 % Run projected Gauss-Newton for imphase
-fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaGrad,'regularizer','grad');
+fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaGrad,'regularizer','grad','weights',weights);
 tic();
 [imphase_PGNR, his_imphase_PGNR] = GaussNewtonProj(fctn, image_proj(:),...
                                                 'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -158,7 +158,7 @@ clear GaussNewtonProj;
 clear imphaseObjFctn;
 
 % Run projected Gauss-Newton for imphasor
-fctn = @(x) imphasorObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaGrad,'regularizer','grad');
+fctn = @(x) imphasorObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaGrad,'regularizer','grad','weights',weights);
 tic();
 [imphasor_PGNR, his_imphasor_PGNR] = GaussNewtonProj(fctn, image_proj(:),...
                                                   'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...

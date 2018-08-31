@@ -27,8 +27,8 @@ solverTol    = 1e-1;
 
 %%
 % Run imphase and imphasor for a number of alpha parameters
-alphaIts    = 11;
-alpha       = logspace(5,-5,alphaIts); % logspace for alpha
+alphaIts    = 16;
+alpha       = logspace(10,-5,alphaIts); % logspace for alpha
 
 imphase_GN_sols     = zeros(numel(image_recur(:)), alphaIts);
 imphase_PGNR_sols   = zeros(numel(image_recur(:)), alphaIts);

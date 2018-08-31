@@ -26,7 +26,7 @@ solverTol    = 1e-1;
 
 %%
 % Run gradient descent for phase
-fctn = @(x) phaseObjFctn(x, A, bispec_phase,'Hflag','ichol');
+fctn = @(x) phaseObjFctn(x, A, bispec_phase,'weights',weights);
 tic();
 [phase_GD, his_phase_GD] = GradientDescentProj(fctn, phase_recur(:),...
                                                 'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -38,7 +38,7 @@ phase_GD  = phase_foldout(reshape(phase_GD,[256 256]), 0);
 image_GD  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*phase_GD(:)),[256 256])))));
 
 % Run gradient descent for phasor
-fctn = @(x) phasorObjFctn(x, A, bispec_phase,'Hflag','ichol');
+fctn = @(x) phasorObjFctn(x, A, bispec_phase,'weights',weights);
 tic();
 [phasor_GD, his_phasor_GD] = GradientDescentProj(fctn, phase_recur(:),...
                                                 'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -51,7 +51,7 @@ imagor_GD  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*phasor_GD(:)
 
 %%
 % Run NLCG for phase
-fctn = @(x) phaseObjFctn(x, A, bispec_phase,'Hflag','ichol');
+fctn = @(x) phaseObjFctn(x, A, bispec_phase,'weights',weights);
 [phase_NLCG, his_phase_NLCG] = NonlinearCG(fctn, phase_recur(:), 'maxIter',maxIter,...
                                            'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
                                            'iterSave',true);
@@ -63,7 +63,7 @@ image_NLCG  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*phase_NLCG(
 
 
 % Run NLCG for phasor
-fctn = @(x) phasorObjFctn(x, A, bispec_phase,'Hflag','ichol');
+fctn = @(x) phasorObjFctn(x, A, bispec_phase,'weights',weights);
 tic();
 [phasor_NLCG, his_phasor_NLCG] = NonlinearCG(fctn, phase_recur(:),'maxIter',maxIter,...
                                              'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -76,7 +76,7 @@ imagor_NLCG  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*phasor_NLC
 
 %%
 % Run LBFGS for phase
-fctn = @(x) phaseObjFctn(x, A, bispec_phase,'Hflag','ichol');
+fctn = @(x) phaseObjFctn(x, A, bispec_phase,'weights',weights);
 [phase_BFGS, his_phase_BFGS] = LBFGS(fctn, phase_recur(:), 'maxIter',maxIter,...
                                      'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
                                      'iterSave',true);
@@ -88,7 +88,7 @@ image_BFGS  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*phase_BFGS(
 
 
 % Run BFGS for phasor
-fctn = @(x) phasorObjFctn(x, A, bispec_phase,'Hflag','ichol');
+fctn = @(x) phasorObjFctn(x, A, bispec_phase,'weights',weights);
 tic();
 [phasor_BFGS, his_phasor_BFGS] = LBFGS(fctn, phase_recur(:),'maxIter',maxIter,...
                                        'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -102,7 +102,7 @@ imagor_BFGS  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*phasor_BFG
 
 %%
 % Run Gauss-Newton for phase
-fctn = @(x) phaseObjFctn(x, A, bispec_phase,'Hflag','full');
+fctn = @(x) phaseObjFctn(x, A, bispec_phase,'Hflag','full','weights',weights);
 tic();
 [phase_GNF, his_phase_GNF] = GaussNewtonProj(fctn, phase_recur(:),...
                                            'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -116,7 +116,7 @@ image_GNF  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*phase_GNF(:)
 
 
 % Run Gauss-Newton for imphasor
-fctn = @(x) phasorObjFctn(x, A, bispec_phase,'Hflag','full');
+fctn = @(x) phasorObjFctn(x, A, bispec_phase,'Hflag','full','weights',weights);
 tic();
 [phasor_GNF, his_phasor_GNF] = GaussNewtonProj(fctn, phase_recur(:),...
                                              'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -130,7 +130,7 @@ imagor_GNF  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*phasor_GNF(
 
 %%
 % Run Gauss-Newton for phase
-fctn = @(x) phaseObjFctn(x, A, bispec_phase,'Hflag','trunc');
+fctn = @(x) phaseObjFctn(x, A, bispec_phase,'Hflag','trunc','weights',weights);
 tic();
 [phase_GNT, his_phase_GNT] = GaussNewtonProj(fctn, phase_recur(:),...
                                            'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -143,7 +143,7 @@ phase_GNT  = phase_foldout(reshape(phase_GNT,[256 256]), 0);
 image_GNT  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*phase_GNT(:)),[256 256])))));
 
 % Run Gauss-Newton for imphasor
-fctn = @(x) phasorObjFctn(x, A, bispec_phase,'Hflag','trunc');
+fctn = @(x) phasorObjFctn(x, A, bispec_phase,'Hflag','trunc','weights',weights);
 tic();
 [phasor_GNT, his_phasor_GNT] = GaussNewtonProj(fctn, phase_recur(:),...
                                              'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -158,7 +158,7 @@ imagor_GNT  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*phasor_GNT(
 
 %%
 % Run Gauss-Newton for phase
-fctn = @(x) phaseObjFctn(x, A, bispec_phase,'Hflag','ichol');
+fctn = @(x) phaseObjFctn(x, A, bispec_phase,'Hflag','ichol','weights',weights);
 tic();
 [phase_GNI, his_phase_GNI] = GaussNewtonProj(fctn, phase_recur(:),...
                                            'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -171,7 +171,7 @@ phase_GNI  = phase_foldout(reshape(phase_GNI,[256 256]), 0);
 image_GNI  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*phase_GNI(:)),[256 256])))));
 
 % Run Gauss-Newton for imphasor
-fctn = @(x) phasorObjFctn(x, A, bispec_phase,'Hflag','ichol');
+fctn = @(x) phasorObjFctn(x, A, bispec_phase,'Hflag','ichol','weights',weights);
 tic();
 [phasor_GNI, his_phasor_GNI] = GaussNewtonProj(fctn, phase_recur(:),...
                                              'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
