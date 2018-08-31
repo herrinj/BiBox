@@ -22,11 +22,11 @@ end
 
 
 % Generate star speckle data and blurred object data, courtesy of Jim Nagy
-[star_phase, star, pupil_mask, scaled_pupil_mask] = GenerateSpecklePSFs(256,nfr,D_r0,[]);
+[star_phase, star, pupil_mask, scaled_pupil_mask] = GenerateSpecklePSFs(256,nfr,D_r0,randi(1e8));
 [data, obj] = GenerateSpeckleData(star, strcat(image_name,'.jpg'),0);
 [data, avg_noise_norm] = scale_and_noise(data, K_n, sigma_rn);
 obj = obj/max(obj(:));
-[star_phase, star, pupil_mask, scaled_pupil_mask] = GenerateSpecklePSFs(256,nfr,D_r0,1);
+[star_phase, star, pupil_mask, scaled_pupil_mask] = GenerateSpecklePSFs(256,nfr,D_r0,randi(1e8));
 star = scale_and_noise(star, 5000.0, 1); % How many photons per star?
 
 OBJ = fftshift(fft2(fftshift(obj)));
