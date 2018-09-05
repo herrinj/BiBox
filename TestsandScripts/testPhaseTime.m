@@ -18,7 +18,7 @@ alphaGrad    = 1e-2;
 %%
 % Set up loop of runs
 
-runs = 10;
+runs = 50;
 
 % Alot memory
 sol_phase_GD       = zeros(n,runs);

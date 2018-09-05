@@ -107,7 +107,7 @@ while 1
     [yt, exitFlag, lsIter] = lineSearch(fctn, yc, dy, Jc, dJ, lsMaxIter, lsReduction); 
     
     % Save old values and re-evaluate objective function
-    yOld = yc; Jold = Jc; yc = yt; dJold = dJ; dy = yt - yc;
+    yOld = yc; Jold = Jc; dy = yt - yc; yc = yt; dJold = dJ; 
     [Jc,para,dJ] = fctn(yc);
     beta = (norm(dJ)^2)/(norm(dJold)^2); % Fletcher-Reeves
 %     beta  = (reshape(dJ,[],1)*(dJ(:)-dJold(:)))/(norm(dJold)^2); % Polak-Ribiere   

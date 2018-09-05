@@ -80,8 +80,8 @@ if alpha > 0
             Sx = Fx.*conj(Fx).*pupil_mask - pospec.^2;
             Sc = 0.5*alpha*sum(Sx(:).^2);
         case{'grad',2}
-            S = getGradient([0 1 0 1],dims);
-            Sx = S*x(:);
+            S  = @(x,flag) getGradientMF(x,[0 1 0 1],dims,flag);
+            Sx = S(x,'notransp');
             Sc = 0.5*alpha*(Sx'*Sx);
         case{'eye',3}
             Sc = 0.5*alpha*(x(:)'*x(:));
@@ -111,7 +111,7 @@ if doGrad % Take the derivative of the objective function w.r.t. the image
                 dS= 2*real(reshape(fft2(fftshift(conj(Fx).*Sx.*pupil_mask)),1,[]));
                 dJ = dJ + alpha*dS(:)';
             case{'grad',2}
-                dJ = dJ + alpha*(Sx'*S);
+                dJ = dJ + alpha*(S(Sx,'transp')');
             case{'eye',3}
                 dJ = dJ + alpha*x(:)';
         end
@@ -139,7 +139,7 @@ if doHess % Returns function handle for Hessian action on a vector. Symmetrix so
                 regOp = @(p) real(4*reshape(fft2(fftshift(conj(Fx).*real(conj(Fx).*fftshift(fft2(reshape(p,dims))).*pupil_mask).*pupil_mask)),[],1));
                 H = @(p) op(p) + alpha*regOp(p);
             case{'grad',2}
-                H = @(p) op(p) + alpha*(S'*(S*p));
+                H = @(p) op(p) + alpha*S(S(p,'notransp'),'transp');
             case{'eye',3}
                 H = @(p) op(p) + alpha*p;
         end
