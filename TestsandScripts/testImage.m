@@ -19,6 +19,7 @@ lower_bound = zeros(numel(image_proj),1);
 tolJ         = 1e-4;            
 tolY         = 1e-3;           
 tolG         = 1e1;
+tolN         = 1e-3;
 maxIter      = 100;
 solverMaxIter= 250;              
 solverTol    = 1e-1;
@@ -100,8 +101,8 @@ fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaPos
 tic();
 [imphase_GN, his_imphase_GN] = GaussNewtonProj(fctn, image_recur(:),...
                                                 'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
-                                                'solver','bispIm','solverMaxIter',250,'solverTol',1e-1,...
-                                                'iterSave',true);
+                                                'tolN',tolN,'solver','bispIm','solverMaxIter',250,...
+                                                'solverTol',1e-1,'iterSave',true);
 time_imphase_GN = toc();
 imphase_GN = reshape(imphase_GN,[256 256]);
 clear GaussNewtonProj;
@@ -112,8 +113,8 @@ fctn = @(x) imphasorObjFctn(x,A, bispec_phase,dims, pupil_mask,'alpha',alphaPos,
 tic();
 [imphasor_GN, his_imphasor_GN] = GaussNewtonProj(fctn, image_recur(:),...
                                                 'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
-                                                'solver','bispIm','solverMaxIter',250,'solverTol',1e-1,...
-                                                'iterSave',true);
+                                                'tolN',tolN,'solver','bispIm','solverMaxIter',250,...
+                                                'solverTol',1e-1,'iterSave',true);
 time_imphasor_GN = toc();
 imphasor_GN = reshape(imphasor_GN, [256 256]);
 clear GaussNewtonProj;
@@ -125,7 +126,7 @@ fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', 0.0,'reg
 tic();
 [imphase_PGN, his_imphase_PGN] = GaussNewtonProj(fctn, image_proj(:),...
                                                 'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
-                                                'solver','bispIm','solverMaxIter',250,'solverTol',1e-1,...
+                                                'tolN',tolN,'solver','bispIm','solverMaxIter',250,'solverTol',1e-1,...
                                                 'upper_bound',upper_bound,'lower_bound',lower_bound,'iterSave',true);
 time_imphase_PGN = toc();
 imphase_PGN = reshape(imphase_PGN,[256 256]);
@@ -137,7 +138,7 @@ fctn = @(x) imphasorObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', 0.0,'re
 tic();
 [imphasor_PGN, his_imphasor_PGN] = GaussNewtonProj(fctn, image_proj(:),...
                                                   'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
-                                                  'solver','bispIm','solverMaxIter',250,'solverTol',1e-1,...
+                                                  'tolN',tolN,'solver','bispIm','solverMaxIter',250,'solverTol',1e-1,...
                                                   'upper_bound',upper_bound,'lower_bound',lower_bound,'iterSave',true);
 time_imphasor_PGN = toc();
 imphasor_PGN = reshape(imphasor_PGN,[256 256]);
@@ -150,7 +151,7 @@ fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaGra
 tic();
 [imphase_PGNR, his_imphase_PGNR] = GaussNewtonProj(fctn, image_proj(:),...
                                                 'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
-                                                'solver','bispIm','solverMaxIter',250,'solverTol',1e-1,...
+                                                'tolN',tolN,'solver','bispIm','solverMaxIter',250,'solverTol',1e-1,...
                                                 'upper_bound',upper_bound,'lower_bound',lower_bound,'iterSave',true);
 time_imphase_PGNR = toc();
 imphase_PGNR = reshape(imphase_PGNR,[256 256]);
@@ -162,7 +163,7 @@ fctn = @(x) imphasorObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaGr
 tic();
 [imphasor_PGNR, his_imphasor_PGNR] = GaussNewtonProj(fctn, image_proj(:),...
                                                   'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
-                                                  'solver','bispIm','solverMaxIter',250,'solverTol',1e-1,...
+                                                  'tolN',tolN,'solver','bispIm','solverMaxIter',250,'solverTol',1e-1,...
                                                   'upper_bound',upper_bound,'lower_bound',lower_bound,'iterSave',true);
 time_imphasor_PGNR = toc();
 imphasor_PGNR = reshape(imphasor_PGNR,[256 256]);
@@ -592,9 +593,9 @@ fprintf('LS(imphase_NLCG)/its   = %1.1f \n', sum(his_imphase_NLCG.array(:,5)/(si
 fprintf('LS(imphasor_NLCG)/its  = %1.1f \n', sum(his_imphasor_NLCG.array(:,5)/(size(its_imphasor_NLCG,2)-1)));
 fprintf('LS(imphase_LBFGS)/its  = %1.1f \n', sum(his_imphase_BFGS.array(:,5)/(size(its_imphase_BFGS,2)-1)));
 fprintf('LS(imphasor_LBFGS)/its = %1.1f \n', sum(his_imphasor_BFGS.array(:,5)/(size(its_imphasor_BFGS,2)-1)));
-fprintf('LS(imphase_GN)/its     = %1.1f \n', sum(his_imphase_GN.array(:,6)/(size(its_imphase_GN,2)-1)));
-fprintf('LS(imphasor_GN)/its    = %1.1f \n', sum(his_imphasor_GN.array(:,6)/(size(its_imphasor_GN,2)-1)));
-fprintf('LS(imphase_PGN)/its    = %1.1f \n', sum(his_imphase_PGN.array(:,6)/(size(its_imphase_PGN,2)-1)));
-fprintf('LS(imphasor_PGN)/its   = %1.1f \n', sum(his_imphasor_PGN.array(:,6)/(size(its_imphasor_PGN,2)-1)));
-fprintf('LS(imphase_PGNR)/its   = %1.1f \n', sum(his_imphase_PGNR.array(:,6)/(size(its_imphase_PGNR,2)-1)));
-fprintf('LS(imphasor_PGNR)/its  = %1.1f \n', sum(his_imphasor_PGNR.array(:,6)/(size(its_imphasor_PGNR,2)-1)));
+fprintf('LS(imphase_GN)/its     = %1.1f \n', sum(his_imphase_GN.array(:,7)/(size(its_imphase_GN,2)-1)));
+fprintf('LS(imphasor_GN)/its    = %1.1f \n', sum(his_imphasor_GN.array(:,7)/(size(its_imphasor_GN,2)-1)));
+fprintf('LS(imphase_PGN)/its    = %1.1f \n', sum(his_imphase_PGN.array(:,7)/(size(its_imphase_PGN,2)-1)));
+fprintf('LS(imphasor_PGN)/its   = %1.1f \n', sum(his_imphasor_PGN.array(:,7)/(size(its_imphasor_PGN,2)-1)));
+fprintf('LS(imphase_PGNR)/its   = %1.1f \n', sum(his_imphase_PGNR.array(:,7)/(size(its_imphase_PGNR,2)-1)));
+fprintf('LS(imphasor_PGNR)/its  = %1.1f \n', sum(his_imphasor_PGNR.array(:,7)/(size(its_imphasor_PGNR,2)-1)));

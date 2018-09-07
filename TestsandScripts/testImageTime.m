@@ -11,6 +11,7 @@ lower_bound  = zeros(n,1);
 tolJ         = 1e-4;            
 tolY         = 1e-3;           
 tolG         = 1e1;
+tolN         = 1e-3;
 maxIter      = 100;
 solverMaxIter= 250;              
 solverTol    = 1e-1;
@@ -237,14 +238,14 @@ for k = 1:runs
     [imphase_GN, his_imphase_GN] = GaussNewtonProj(fctn, image_recur(:),...
                                                     'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
                                                     'solver','bispIm','solverMaxIter',250,'solverTol',1e-1,...
-                                                    'iterSave',true);
+                                                    'tolN',tolN,'iterSave',true);
     time_imphase_GN(k)  = toc();
     imphase_GN          = reshape(imphase_GN,[256 256])/max(imphase_GN(:));
     s                   = measureShift(obj,imphase_GN);
     imphase_GN          = shiftImage(imphase_GN,s);
     sol_imphase_GN(:,k) = imphase_GN(:);
     its_imphase_GN(k)   = size(his_imphase_GN.iters,2)-1;
-    LS_imphase_GN(k)    = sum(his_imphase_GN.array(:,6));
+    LS_imphase_GN(k)    = sum(his_imphase_GN.array(:,7));
     ROF_imphase_GN(k)   = his_imphase_GN.array(end,2)/his_imphase_GN.array(1,2);
     clear GaussNewtonProj;
     clear imphaseObjFctn;
@@ -255,14 +256,14 @@ for k = 1:runs
     [imphasor_GN, his_imphasor_GN] = GaussNewtonProj(fctn, image_recur(:),...
                                                     'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
                                                     'solver','bispIm','solverMaxIter',250,'solverTol',1e-1,...
-                                                    'iterSave',true);
+                                                    'tolN',tolN,'iterSave',true);
     time_imphasor_GN(k)  = toc();
     imphasor_GN          = reshape(imphasor_GN,[256 256])/max(imphasor_GN(:));
     s                    = measureShift(obj,imphasor_GN);
     imphasor_GN          = shiftImage(imphasor_GN,s);
     sol_imphasor_GN(:,k) = imphasor_GN(:);
     its_imphasor_GN(k)   = size(his_imphasor_GN.iters,2)-1;
-    LS_imphasor_GN(k)    = sum(his_imphasor_GN.array(:,6));
+    LS_imphasor_GN(k)    = sum(his_imphasor_GN.array(:,7));
     ROF_imphasor_GN(k)   = his_imphasor_GN.array(end,2)/his_imphasor_GN.array(1,2);
     clear GaussNewtonProj;
     clear imphasorObjFctn;
@@ -274,14 +275,14 @@ for k = 1:runs
     [imphase_PGN, his_imphase_PGN] = GaussNewtonProj(fctn, image_proj(:),...
                                                     'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
                                                     'solver','bispIm','solverMaxIter',250,'solverTol',1e-1,...
-                                                    'upper_bound',upper_bound,'lower_bound',lower_bound,'iterSave',true);
+                                                    'tolN',tolN,'upper_bound',upper_bound,'lower_bound',lower_bound,'iterSave',true);
     time_imphase_PGN(k)  = toc();
     imphase_PGN          = reshape(imphase_PGN,[256 256])/max(imphase_PGN(:));
     s                    = measureShift(obj,imphase_PGN);
     imphase_PGN          = shiftImage(imphase_PGN,s);
     sol_imphase_PGN(:,k) = imphase_PGN(:);
     its_imphase_PGN(k)   = size(his_imphase_PGN.iters,2)-1;
-    LS_imphase_PGN(k)    = sum(his_imphase_PGN.array(:,6));
+    LS_imphase_PGN(k)    = sum(his_imphase_PGN.array(:,7));
     ROF_imphase_PGN(k)   = his_imphase_PGN.array(end,2)/his_imphase_PGN.array(1,2);
     clear GaussNewtonProj;
     clear imphaseObjFctn;
@@ -292,14 +293,14 @@ for k = 1:runs
     [imphasor_PGN, his_imphasor_PGN] = GaussNewtonProj(fctn, image_proj(:),...
                                                       'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
                                                       'solver','bispIm','solverMaxIter',250,'solverTol',1e-1,...
-                                                      'upper_bound',upper_bound,'lower_bound',lower_bound,'iterSave',true);
+                                                      'tolN',tolN,'upper_bound',upper_bound,'lower_bound',lower_bound,'iterSave',true);
     time_imphasor_PGN(k)  = toc();
     imphasor_PGN          = reshape(imphasor_PGN,[256 256])/max(imphasor_PGN(:));
     s                     = measureShift(obj,imphasor_PGN);
     imphasor_PGN          = shiftImage(imphasor_PGN,s);
     sol_imphasor_PGN(:,k) = imphasor_PGN(:);
     its_imphasor_PGN(k)   = size(his_imphasor_PGN.iters,2)-1;
-    LS_imphasor_PGN(k)    = sum(his_imphasor_PGN.array(:,6));
+    LS_imphasor_PGN(k)    = sum(his_imphasor_PGN.array(:,7));
     ROF_imphasor_PGN(k)   = his_imphasor_PGN.array(end,2)/his_imphasor_PGN.array(1,2);
     clear GaussNewtonProj;
     clear imphasorObjFctn;
@@ -310,14 +311,14 @@ for k = 1:runs
     [imphase_PGNR, his_imphase_PGNR] = GaussNewtonProj(fctn, image_proj(:),...
                                                     'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
                                                     'solver','bispIm','solverMaxIter',250,'solverTol',1e-1,...
-                                                    'upper_bound',upper_bound,'lower_bound',lower_bound,'iterSave',true);
+                                                    'tolN',tolN,'upper_bound',upper_bound,'lower_bound',lower_bound,'iterSave',true);
     time_imphase_PGNR(k)  = toc();
     imphase_PGNR          = reshape(imphase_PGNR,[256 256])/max(imphase_PGNR(:));
     s                     = measureShift(obj,imphase_PGNR);
     imphase_PGNR          = shiftImage(imphase_PGNR,s);
     sol_imphase_PGNR(:,k) = imphase_PGNR(:);
     its_imphase_PGNR(k)   = size(his_imphase_PGNR.iters,2)-1;
-    LS_imphase_PGNR(k)    = sum(his_imphase_PGNR.array(:,6)); 
+    LS_imphase_PGNR(k)    = sum(his_imphase_PGNR.array(:,7)); 
     ROF_imphase_PGNR(k)   = his_imphase_PGNR.array(end,2)/his_imphase_PGNR.array(1,2);
     clear GaussNewtonProj;
     clear imphaseObjFctn;
@@ -328,14 +329,14 @@ for k = 1:runs
     [imphasor_PGNR, his_imphasor_PGNR] = GaussNewtonProj(fctn, image_proj(:),...
                                                       'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
                                                       'solver','bispIm','solverMaxIter',250,'solverTol',1e-1,...
-                                                      'upper_bound',upper_bound,'lower_bound',lower_bound,'iterSave',true);
+                                                      'tolN',tolN,'upper_bound',upper_bound,'lower_bound',lower_bound,'iterSave',true);
     time_imphasor_PGNR(k)   = toc();
     imphasor_PGNR          = reshape(imphasor_PGNR,[256 256])/max(imphasor_PGNR(:));
     s                      = measureShift(obj,imphasor_PGNR);
     imphasor_PGNR          = shiftImage(imphasor_PGNR,s);
     sol_imphasor_PGNR(:,k) = imphasor_PGNR(:);
     its_imphasor_PGNR(k)   = size(his_imphasor_PGNR.iters,2)-1;
-    LS_imphasor_PGNR(k)    = sum(his_imphasor_PGNR.array(:,6));
+    LS_imphasor_PGNR(k)    = sum(his_imphasor_PGNR.array(:,7));
     ROF_imphasor_PGNR(k)   = his_imphasor_PGNR.array(end,2)/his_imphasor_PGNR.array(1,2);
     clear GaussNewtonProj;
     clear imphasorObjFctn;

@@ -158,7 +158,7 @@ function runMinimalExample
     setupBispectrumData;
     image_recur     = real(fftshift(ifft2(fftshift(pospec.*exp(1i*phase_recur)))));
     dims            = size(image_recur);
-    fctn  = @(x) imphasorObjFctn(x, A, bispec_phase, dims, pupil_mask, 'regularizer','pos','alpha',100);
+    fctn  = @(x) imphasorObjFctn(x, A, bispec_phase, dims, pupil_mask, 'regularizer','grad','alpha',0.1);
 
     x = randn(numel(image_recur),1);
     [f0,~,df,d2f] = fctn(x);

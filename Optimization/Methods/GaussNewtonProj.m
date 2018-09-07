@@ -62,6 +62,7 @@ paraStop     = [];
 tolJ         = 1e-4;            % stopping tolerance, objective function
 tolY         = 1e-4;            % stopping tolerance, norm of solution
 tolG         = 1e-4;            % stopping tolerance, norm of gradient
+tolN         = 1e-4;            % stopping tolerance, relative Newton decrement
 
 % Gauss-Newton step solve parameters
 solver       = [];             
@@ -81,7 +82,7 @@ lineSearch   = @proj_armijo; % Could potentially call to other projected LS
 verbose      = true;         % flag to print out
 iterSave     = 0;            % flag to save iterations
 iterVP       = 0;            % flag to save VarPro linear variables from para structure
-stop         = zeros(5,1);   % vector for stopping criteria
+stop         = zeros(6,1);   % vector for stopping criteria
 Plots        = @(iter,para) []; % for plots;
 
 % Overwrite default parameters above using varargin
@@ -101,16 +102,16 @@ end
 
 % History output
 his          = [];
-hisArray     = zeros(maxIter+1,7);
-hisStr       = {'iter','J','Jold-J','|proj_dJ|','|dy|','LS','Active'};
+hisArray     = zeros(maxIter+1,8);
+hisStr       = {'iter','J','Jold-J','|proj_dJ|','|dy|','<dJ,dy>','LS','Active'};
 
-yc = y0;
+yc = y0; newtD = 1;
 active = (yc <= lower_bound)|(yc >= upper_bound);
 [Jc,para,dJ,op] = fctn(yc); 
 proj_dJ = proj_grad(dJ, yc, lower_bound, upper_bound);
 Plots('start',para);
 iter = 0; yOld = 0*yc; Jold = Jc;
-hisArray(1,:) = [0 , Jc, Jc, norm(proj_dJ), norm(y0), 0, sum(active>0)];
+hisArray(1,:) = [0 , Jc, Jc, norm(proj_dJ), norm(y0), 0, 0, sum(active>0)];
 
 
 % Save iterates
@@ -129,8 +130,8 @@ if verbose
     fprintf('%s %s %s\n',ones(1,20)*char('='),mfilename,ones(1,20)*char('='));
     fprintf('[ maxIter=%s / tolJ=%s / tolU=%s / tolG=%s / length(yc)=%d ]\n',...
     num2str(maxIter),num2str(tolJ),num2str(tolY),num2str(tolG),length(yc));
-    fprintf('%4s %-12s %-12s %-12s %-12s %4s %-8s \n %s \n', hisStr{:},char(ones(1,64)*'-'));
-    dispHis = @(var) fprintf('%4d %-12.4e %-12.3e %-12.3e %-12.3e %4d %-8d \n',var);
+    fprintf('-%4s %-12s %-12s %-12s %-12s %-12s %-4s %-8s \n %s \n', hisStr{:},char(ones(1,64)*'-'));
+    dispHis = @(var) fprintf('%-4d %-12.4e %-12.3e %-12.3e %-12.3e %-12.3e %-4d %-8d \n',var);
     dispHis(hisArray(1,:));
 end
 
@@ -141,9 +142,10 @@ while 1
     stop(1) = (iter>0) && abs(Jold-Jc)   <= tolJ*(1+abs(Jstop));
     stop(2) = (iter>0) && (norm(yc-yOld) <= tolY*(1+norm(y0)));
     stop(3) = norm(proj_dJ)              <= tolG*(1+abs(Jstop));
-    stop(4) = norm(proj_dJ)              <= 1e6*eps;
-    stop(5) = (iter >= maxIter);
-    if (all(stop(1:3)) || any(stop(4:5)))
+    stop(4) = newtD                      <= tolN;
+    stop(5) = norm(proj_dJ)              <= 1e6*eps;
+    stop(6) = (iter >= maxIter);
+    if (all(stop(1:3)) || stop(4) || any(stop(5:6)))
         break;  
     end
     
@@ -174,13 +176,18 @@ while 1
     [yt, exitFlag, lsIter] = lineSearch(fctn, yc, dy, Jc, proj_dJ, lower_bound, upper_bound, lsMaxIter, lsReduction); 
     
     % Save old values and re-evaluate objective function
-    yOld = yc; Jold = Jc; yc = yt;
-    active = (yc <= lower_bound)|(yc >= upper_bound);      % update active set
+    yOld    = yc; Jold = Jc; yc = yt;
+    active  = (yc <= lower_bound)|(yc >= upper_bound);      % update active set
     [Jc,para,dJ,op] = fctn(yc);                              % evalute objective function
     proj_dJ = proj_grad(dJ, yc, lower_bound, upper_bound);  % projected gradient
-  
+    if iter==1 
+        newtD0   = abs(proj_dJ(:)'*dy);
+    end
+    newtD = abs(proj_dJ(:)'*dy)/newtD0;  
+    
     % Some output
-    hisArray(iter+1,:) = [iter, Jc, Jold-Jc, norm(proj_dJ), norm(yc-yOld), lsIter, sum(active>0)];
+    hisArray(iter+1,:) = [iter, Jc, Jold-Jc, norm(proj_dJ), norm(yc-yOld),...
+                          newtD, lsIter, sum(active>0)];
     if verbose
         dispHis(hisArray(iter+1,:));
     end
@@ -219,8 +226,10 @@ if verbose
     fprintf('%d[ %-10s=%16.8e <= %-25s=%16.8e]\n',stop(3),...
     '|dJ|',norm(proj_dJ),'tolG*(1+abs(Jstop))',tolG*(1+abs(Jstop)));
     fprintf('%d[ %-10s=%16.8e <= %-25s=%16.8e]\n',stop(4),...
+    '<dJ,dy>',newtD,'tolN',tolN);
+    fprintf('%d[ %-10s=%16.8e <= %-25s=%16.8e]\n',stop(5),...
     'norm(dJ)',norm(proj_dJ),'eps',1e3*eps);
-    fprintf('%d[ %-10s=  %-14d >= %-25s=  %-14d]\n',stop(5),...
+    fprintf('%d[ %-10s=  %-14d >= %-25s=  %-14d]\n',stop(6),...
     'iter',iter,'maxIter',maxIter);
 
     %FAIRmessage([mfilename,' : done !'],'=');

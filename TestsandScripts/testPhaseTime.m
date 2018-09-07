@@ -9,11 +9,10 @@ n = 256^2;
 tolJ         = 1e-4;            
 tolY         = 1e-3;           
 tolG         = 1e1;
+tolN         = 1e-3;
 maxIter      = 100;
 solverMaxIter= 250;              
 solverTol    = 1e-1;
-alphaPos     = 1e5;
-alphaGrad    = 1e-2;
 
 %%
 % Set up loop of runs
@@ -26,7 +25,7 @@ sol_phasor_GD      = zeros(n,runs);
 sol_phase_NLCG     = zeros(n,runs);
 sol_phasor_NLCG    = zeros(n,runs);
 sol_phase_BFGS     = zeros(n,runs);
-sol_iphasor_BFGS   = zeros(n,runs);
+sol_phasor_BFGS    = zeros(n,runs);
 sol_phase_GNF      = zeros(n,runs);
 sol_phasor_GNF     = zeros(n,runs);
 sol_phase_GNT      = zeros(n,runs);
@@ -120,7 +119,6 @@ for k = 1:runs
     setupBispectrumData;
     image_recur = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*phase_recur(:)),[256 256])))));
     dims = size(image_recur);
-    image_proj  = gdnnf_projection(image_recur, sum(image_recur(:))) + 1e-4;
     avg_data_frame = sum(data,3)/size(data,3); avg_data_frame = avg_data_frame/max(avg_data_frame(:));
     obj = obj/max(obj(:));
     
@@ -177,7 +175,7 @@ for k = 1:runs
     sol_phase_NLCG(:,k) = image_NLCG(:);
     its_phase_NLCG(k)   = size(his_phase_NLCG.iters,2)-1;
     LS_phase_NLCG(k)    = sum(his_phase_NLCG.array(:,5));
-    ROF_phase_NCLG(k)   = his_phase_NLCG.array(end,2)/his_phase_NLCG.array(1,2);
+    ROF_phase_NLCG(k)   = his_phase_NLCG.array(end,2)/his_phase_NLCG.array(1,2);
     clear NonlinearCG;
     clear phaseObjFctn;
 
@@ -196,7 +194,7 @@ for k = 1:runs
     sol_phasor_NLCG(:,k)  = imagor_NLCG(:);
     its_phasor_NLCG(k)    = size(his_phasor_NLCG.iters,2)-1;
     LS_phasor_NLCG(k)     = sum(his_phasor_NLCG.array(:,5));
-    ROF_phasor_NCLG(k)    = his_phasor_NLCG.array(end,2)/his_phasor_NLCG.array(1,2);
+    ROF_phasor_NLCG(k)    = his_phasor_NLCG.array(end,2)/his_phasor_NLCG.array(1,2);
     clear NonlinearCG;
     clear phasorObjFctn;
 
@@ -244,7 +242,7 @@ for k = 1:runs
     [phase_GNF, his_phase_GNF] = GaussNewtonProj(fctn, phase_recur(:),...
                                                'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
                                                'solver','bispPhFull','solverMaxIter',250,'solverTol',1e-1,...
-                                               'iterSave',true);
+                                               'tolN',tolN,'iterSave',true);
     time_phase_GNF(k) = toc();
     phase_GNF  = phase_foldout(reshape(phase_GNF,[256 256]), 0);
     image_GNF  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*phase_GNF(:)),[256 256])))));
@@ -253,7 +251,7 @@ for k = 1:runs
     image_GNF          = shiftImage(image_GNF,s);
     sol_phase_GNF(:,k) = image_GNF(:);
     its_phase_GNF(k)   = size(his_phase_GNF.iters,2)-1;
-    LS_phase_GNF(k)    = sum(his_phase_GNF.array(:,6));
+    LS_phase_GNF(k)    = sum(his_phase_GNF.array(:,7));
     ROF_phase_GNF(k)   = his_phase_GNF.array(end,2)/his_phase_GNF.array(1,2);
     clear GaussNewtonProj;
     clear phaseObjFctn;
@@ -264,7 +262,7 @@ for k = 1:runs
     [phasor_GNF, his_phasor_GNF] = GaussNewtonProj(fctn, phase_recur(:),...
                                                  'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
                                                  'solver','bispPhFull','solverMaxIter',250,'solverTol',1e-1,...
-                                                 'iterSave',true);
+                                                 'tolN',tolN,'iterSave',true);
     time_phasor_GNF(k) = toc();
     phasor_GNF  = phase_foldout(reshape(phasor_GNF,[256 256]), 0);
     imagor_GNF  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*phasor_GNF(:)),[256 256])))));
@@ -273,7 +271,7 @@ for k = 1:runs
     imagor_GNF           = shiftImage(imagor_GNF,s);
     sol_phasor_GNF(:,k)  = imagor_GNF(:);
     its_phasor_GNF(k)    = size(his_phasor_GNF.iters,2)-1;
-    LS_phasor_GNF(k)     = sum(his_phasor_GNF.array(:,6));
+    LS_phasor_GNF(k)     = sum(his_phasor_GNF.array(:,7));
     ROF_phasor_GNF(k)    = his_phasor_GNF.array(end,2)/his_phasor_GNF.array(1,2);
     clear GaussNewtonProj;
     clear phasorObjFctn;
@@ -284,7 +282,7 @@ for k = 1:runs
     [phase_GNT, his_phase_GNT] = GaussNewtonProj(fctn, phase_recur(:),...
                                                'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
                                                'solver','bispPhTrunc','solverMaxIter',250,'solverTol',1e-1,...
-                                               'iterSave',true);
+                                               'tolN',tolN,'iterSave',true);
     time_phase_GNT(k) = toc();
     phase_GNT  = phase_foldout(reshape(phase_GNT,[256 256]), 0);
     image_GNT  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*phase_GNT(:)),[256 256])))));
@@ -293,7 +291,7 @@ for k = 1:runs
     image_GNT          = shiftImage(image_GNT,s);
     sol_phase_GNT(:,k) = image_GNT(:);
     its_phase_GNT(k)   = size(his_phase_GNT.iters,2)-1;
-    LS_phase_GNT(k)    = sum(his_phase_GNT.array(:,6));
+    LS_phase_GNT(k)    = sum(his_phase_GNT.array(:,7));
     ROF_phase_GNT(k)   = his_phase_GNT.array(end,2)/his_phase_GNT.array(1,2);
     clear GaussNewtonProj;
     clear phaseObjFctn;
@@ -304,7 +302,7 @@ for k = 1:runs
     [phasor_GNT, his_phasor_GNT] = GaussNewtonProj(fctn, phase_recur(:),...
                                                  'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
                                                  'solver','bispPhTrunc','solverMaxIter',250,'solverTol',1e-1,...
-                                                 'iterSave',true);
+                                                 'tolN',tolN,'iterSave',true);
     time_phasor_GNT(k) = toc();
     phasor_GNT  = phase_foldout(reshape(phasor_GNT,[256 256]), 0);
     imagor_GNT  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*phasor_GNT(:)),[256 256])))));
@@ -313,7 +311,7 @@ for k = 1:runs
     imagor_GNT           = shiftImage(imagor_GNT,s);
     sol_phasor_GNT(:,k)  = imagor_GNT(:);
     its_phasor_GNT(k)    = size(his_phasor_GNT.iters,2)-1;
-    LS_phasor_GNT(k)     = sum(his_phasor_GNT.array(:,6));
+    LS_phasor_GNT(k)     = sum(his_phasor_GNT.array(:,7));
     ROF_phasor_GNT(k)   = his_phasor_GNT.array(end,2)/his_phasor_GNT.array(1,2);
     clear GaussNewtonProj;
     clear phasorObjFctn;
@@ -325,7 +323,7 @@ for k = 1:runs
     [phase_GNI, his_phase_GNI] = GaussNewtonProj(fctn, phase_recur(:),...
                                                'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
                                                'solver','bispPhIchol','solverMaxIter',250,'solverTol',1e-1,...
-                                               'iterSave',true);
+                                               'tolN',tolN,'iterSave',true);
     time_phase_GNI(k) = toc();
     phase_GNI  = phase_foldout(reshape(phase_GNI,[256 256]), 0);
     image_GNI  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*phase_GNI(:)),[256 256])))));
@@ -334,7 +332,7 @@ for k = 1:runs
     image_GNI          = shiftImage(image_GNI,s);
     sol_phase_GNI(:,k) = image_GNI(:);
     its_phase_GNI(k)   = size(his_phase_GNI.iters,2)-1;
-    LS_phase_GNI(k)    = sum(his_phase_GNI.array(:,6));
+    LS_phase_GNI(k)    = sum(his_phase_GNI.array(:,7));
     ROF_phase_GNI(k)   = his_phase_GNI.array(end,2)/his_phase_GNI.array(1,2);
     clear GaussNewtonProj;
     clear phaseObjFctn;
@@ -345,7 +343,7 @@ for k = 1:runs
     [phasor_GNI, his_phasor_GNI] = GaussNewtonProj(fctn, phase_recur(:),...
                                                  'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
                                                  'solver','bispPhIchol','solverMaxIter',250,'solverTol',1e-1,...
-                                                 'iterSave',true);
+                                                 'tolN',tolN,'iterSave',true);
     time_phasor_GNI(k) = toc();
     phasor_GNI  = phase_foldout(reshape(phasor_GNI,[256 256]), 0);
     imagor_GNI  = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*phasor_GNI(:)),[256 256])))));
@@ -354,7 +352,7 @@ for k = 1:runs
     imagor_GNI           = shiftImage(imagor_GNI,s);
     sol_phasor_GNI(:,k)  = imagor_GNI(:);
     its_phasor_GNI(k)    = size(his_phasor_GNI.iters,2)-1;
-    LS_phasor_GNI(k)     = sum(his_phasor_GNI.array(:,6));
+    LS_phasor_GNI(k)     = sum(his_phasor_GNI.array(:,7));
     ROF_phasor_GNI(k)   = his_phasor_GNI.array(end,2)/his_phasor_GNI.array(1,2);
     clear GaussNewtonProj;
     clear phasorObjFctn;

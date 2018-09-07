@@ -14,20 +14,26 @@ function [Rx] = getGradientMF(x,omega,m,flag)
 %
 % =========================================================================
 
+if nargin==0
+    runMinimalExample;
+    return;
+end
+
 dim = length(omega)/2;
 h     = (omega(2:2:end)-omega(1:2:end))./m;
 
 switch flag
     case 'notransp' % R*x
-        x = reshape(x,m);
         switch dim
             case 1
                 Rx  = (x(2:end) - x(1:end-1))/h(1);
             case 2
+                x = reshape(x,m);
                 Rx1 = (x(2:end,:) - x(1:end-1,:))/h(1);
                 Rx2 = (x(:,2:end) - x(:,1:end-1))/h(2);
                 Rx  = [Rx1(:);Rx2(:)];
             case 3
+                x = reshape(x,m);
                 Rx1 = (x(2:end,:,:) - x(1:end-1,:,:))/h(1);
                 Rx2 = (x(:,2:end,:) - x(:,1:end-1,:))/h(2);
                 Rx3 = (x(:,:,2:end) - x(:,:,1:end-1))/h(3);
@@ -59,6 +65,17 @@ switch flag
                 Rx  = Rx1(:) + Rx2(:) + Rx3(:);
         end
 end
+end
+
+function runMinimalExample
+    m = [4 4];
+    omega = [0 1 0 1];
+    x = randn(prod(m),1);
+    Gx = getGradientMF(x,omega,m,'notransp');
+    
+    fprintf('Matrix-free multiplication by the discrete gradient operator\n');
+    display(x);
+    display(Gx);
 end
 
 

@@ -18,9 +18,10 @@ avg_data_frame = sum(data,3)/size(data,3); avg_data_frame = avg_data_frame/max(a
 upper_bound = ones(numel(image_proj),1);
 lower_bound = zeros(numel(image_proj),1);
 tolJ         = 1e-4;            
-tolY         = 1e-4;           
-tolG         = 1e1;
-maxIter      = 50;
+tolY         = 1e-3;           
+tolG         = 1e3;
+tolN         = 1e-3;
+maxIter      = 100;
 solverMaxIter= 250;              
 solverTol    = 1e-1;
 
@@ -106,8 +107,8 @@ fctn = @(x) phaseObjFctn(x, A, bispec_phase,'Hflag','full','weights',weights);
 tic();
 [phase_GNF, his_phase_GNF] = GaussNewtonProj(fctn, phase_recur(:),...
                                            'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
-                                           'solver','bispPhFull','solverMaxIter',250,'solverTol',1e-1,...
-                                           'iterSave',true);
+                                           'tolN',tolN,'solver','bispPhFull','solverMaxIter',250,...
+                                           'solverTol',1e-1,'iterSave',true);
 time_phase_GNF = toc();
 clear GaussNewtonProj;
 clear phaseObjFctn;
@@ -120,8 +121,8 @@ fctn = @(x) phasorObjFctn(x, A, bispec_phase,'Hflag','full','weights',weights);
 tic();
 [phasor_GNF, his_phasor_GNF] = GaussNewtonProj(fctn, phase_recur(:),...
                                              'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
-                                             'solver','bispPhFull','solverMaxIter',250,'solverTol',1e-1,...
-                                             'iterSave',true);
+                                             'tolN',tolN,'solver','bispPhFull','solverMaxIter',250,...
+                                             'solverTol',1e-1,'iterSave',true);
 time_phasor_GNF = toc();
 clear GaussNewtonProj;
 clear phasorObjFctn;
@@ -134,8 +135,8 @@ fctn = @(x) phaseObjFctn(x, A, bispec_phase,'Hflag','trunc','weights',weights);
 tic();
 [phase_GNT, his_phase_GNT] = GaussNewtonProj(fctn, phase_recur(:),...
                                            'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
-                                           'solver','bispPhTrunc','solverMaxIter',250,'solverTol',1e-1,...
-                                           'iterSave',true);
+                                           'tolN',tolN,'solver','bispPhTrunc','solverMaxIter',250,...
+                                           'solverTol',1e-1,'iterSave',true);
 time_phase_GNT = toc();
 clear GaussNewtonProj;
 clear phaseObjFctn;
@@ -147,8 +148,8 @@ fctn = @(x) phasorObjFctn(x, A, bispec_phase,'Hflag','trunc','weights',weights);
 tic();
 [phasor_GNT, his_phasor_GNT] = GaussNewtonProj(fctn, phase_recur(:),...
                                              'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
-                                             'solver','bispPhTrunc','solverMaxIter',250,'solverTol',1e-1,...
-                                             'iterSave',true);
+                                             'tolN',tolN,'solver','bispPhTrunc','solverMaxIter',250,...
+                                             'solverTol',1e-1,'iterSave',true);
 time_phasor_GNT = toc();
 clear GaussNewtonProj;
 clear phasorObjFctn;
@@ -162,8 +163,8 @@ fctn = @(x) phaseObjFctn(x, A, bispec_phase,'Hflag','ichol','weights',weights);
 tic();
 [phase_GNI, his_phase_GNI] = GaussNewtonProj(fctn, phase_recur(:),...
                                            'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
-                                           'solver','bispPhIchol','solverMaxIter',250,'solverTol',1e-1,...
-                                           'iterSave',true);
+                                           'tolN',tolN,'solver','bispPhIchol','solverMaxIter',250,...
+                                           'solverTol',1e-1,'iterSave',true);
 time_phase_GNI = toc();
 clear GaussNewtonProj;
 clear phaseObjFctn;
@@ -175,8 +176,8 @@ fctn = @(x) phasorObjFctn(x, A, bispec_phase,'Hflag','ichol','weights',weights);
 tic();
 [phasor_GNI, his_phasor_GNI] = GaussNewtonProj(fctn, phase_recur(:),...
                                              'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
-                                             'solver','bispPhIchol','solverMaxIter',250,'solverTol',1e-1,...
-                                             'iterSave',true);
+                                             'tolN',tolN,'solver','bispPhIchol','solverMaxIter',250,...
+                                             'solverTol',1e-1,'iterSave',true);
 time_phasor_GNI = toc();
 clear GaussNewtonProj;
 clear phasorObjFctn;
@@ -614,8 +615,8 @@ fprintf('time(phase_GNF)/its   = %1.4e \n', time_phase_GNF/size(its_phase_GNF,3)
 fprintf('time(phasor_GNF)/its  = %1.4e \n', time_phasor_GNF/size(its_phasor_GNF,3));
 fprintf('time(phase_GNT)/its   = %1.4e \n', time_phase_GNT/size(its_phase_GNT,3));
 fprintf('time(phasor_GNT)/its  = %1.4e \n', time_phasor_GNT/size(its_phasor_GNT,3));
-fprintf('time(phase_GNI)/its  = %1.4e \n', time_phase_GNI/size(its_phase_GNI,3));
-fprintf('time(phasor_GNI)/its = %1.4e \n', time_phasor_GNI/size(its_phasor_GNI,3));
+fprintf('time(phase_GNI)/its   = %1.4e \n', time_phase_GNI/size(its_phase_GNI,3));
+fprintf('time(phasor_GNI)/its  = %1.4e \n', time_phasor_GNI/size(its_phasor_GNI,3));
 
 fprintf('\n***** Outer Iterations til Convergence *****\n');
 fprintf('iters(phase_GD)      = %d \n', size(its_phase_GD,3)-1);
@@ -638,9 +639,9 @@ fprintf('LS(phase_NLCG)/its   = %1.1f \n', sum(his_phase_NLCG.array(:,5)/(size(i
 fprintf('LS(phasor_NLCG)/its  = %1.1f \n', sum(his_phasor_NLCG.array(:,5)/(size(its_phasor_NLCG,3)-1)));
 fprintf('LS(phase_LBFGS)/its  = %1.1f \n', sum(his_phase_BFGS.array(:,5)/(size(its_phase_BFGS,3)-1)));
 fprintf('LS(phasor_LBFGS)/its = %1.1f \n', sum(his_phasor_BFGS.array(:,5)/(size(its_phasor_BFGS,3)-1)));
-fprintf('LS(phase_GNF)/its    = %1.1f \n', sum(his_phase_GNF.array(:,6)/(size(its_phase_GNF,3)-1)));
-fprintf('LS(phasor_GNF)/its   = %1.1f \n', sum(his_phasor_GNF.array(:,6)/(size(its_phasor_GNF,3)-1)));
-fprintf('LS(phase_GNT)/its    = %1.1f \n', sum(his_phase_GNT.array(:,6)/(size(its_phase_GNT,3)-1)));
-fprintf('LS(phasor_GNT)/its   = %1.1f \n', sum(his_phasor_GNT.array(:,6)/(size(its_phasor_GNT,3)-1)));
-fprintf('LS(phase_GNI)/its    = %1.1f \n', sum(his_phase_GNI.array(:,6)/(size(its_phase_GNI,3)-1)));
-fprintf('LS(phasor_GNI)/its   = %1.1f \n', sum(his_phasor_GNI.array(:,6)/(size(its_phasor_GNI,3)-1)));
+fprintf('LS(phase_GNF)/its    = %1.1f \n', sum(his_phase_GNF.array(:,7)/(size(its_phase_GNF,3)-1)));
+fprintf('LS(phasor_GNF)/its   = %1.1f \n', sum(his_phasor_GNF.array(:,7)/(size(its_phasor_GNF,3)-1)));
+fprintf('LS(phase_GNT)/its    = %1.1f \n', sum(his_phase_GNT.array(:,7)/(size(its_phase_GNT,3)-1)));
+fprintf('LS(phasor_GNT)/its   = %1.1f \n', sum(his_phasor_GNT.array(:,7)/(size(its_phasor_GNT,3)-1)));
+fprintf('LS(phase_GNI)/its    = %1.1f \n', sum(his_phase_GNI.array(:,7)/(size(its_phase_GNI,3)-1)));
+fprintf('LS(phasor_GNI)/its   = %1.1f \n', sum(his_phasor_GNI.array(:,7)/(size(its_phasor_GNI,3)-1)));
