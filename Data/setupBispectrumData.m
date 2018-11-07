@@ -13,7 +13,7 @@
 file_name = strcat(image_name,sprintf('_%d_%d.mat', nfr, D_r0));
 data_path = fileparts(which(mfilename('fullpath')));
 full_name = fullfile(data_path,file_name);
-file_OK = exist(full_name,'file');
+file_OK   = exist(full_name,'file');
 check_save = 0;
 if file_OK && check_save
     load(full_name);
@@ -39,7 +39,7 @@ STAR = fftshift(fft2(fftshift(star)));
 
 % Generate the index structure to vectorize the bispectrum operations
 N = size(data,1); % expects square images
-fourier_rad = 64; 
+fourier_rad = 96; 
 second_rad = 5;
 pupil_mask0 = MakeMask(fourier_rad*2,1);
 pupil_mask = padarray(pupil_mask0, [(256 - size(pupil_mask0,1))/2, (256 - size(pupil_mask0,2))/2], 'both');

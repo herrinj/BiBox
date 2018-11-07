@@ -14,10 +14,10 @@ image_proj  = gdnnf_projection(image_recur, sum(image_recur(:))) + 1e-4;
 avg_data_frame = sum(data,3)/size(data,3); avg_data_frame = avg_data_frame/max(avg_data_frame(:));
 
 % Setup Gauss-Newton parameters
-upper_bound = ones(numel(image_proj),1);
+upper_bound = inf*ones(numel(image_proj),1);
 lower_bound = zeros(numel(image_proj),1);
 tolJ         = 1e-4;            
-tolY         = 1e-3;           
+tolY         = 5e-3;           
 tolG         = 1e1;
 tolN         = 1e-3;
 maxIter      = 100;
@@ -198,8 +198,8 @@ subplot(3,6,5);  imagesc(avg_data_frame); axis image; axis off; colorbar;  title
 subplot(3,6,7);  imagesc(imphase_GD); axis image; axis off; colorbar;  title('Imphase - GD');
 subplot(3,6,8);  imagesc(imphase_NLCG); axis image; axis off; colorbar;  title('Imphase - NLCG');
 subplot(3,6,9);  imagesc(imphase_BFGS); axis image; axis off; colorbar;  title('Imphase - LBFGS');
-subplot(3,6,10);  imagesc(imphase_GN); axis image; axis off; colorbar;  title('Imphase - GN');
-subplot(3,6,11);  imagesc(imphase_PGN); axis image; axis off; colorbar;  title('Imphase - PGN');
+subplot(3,6,10); imagesc(imphase_GN); axis image; axis off; colorbar;  title('Imphase - GN');
+subplot(3,6,11); imagesc(imphase_PGN); axis image; axis off; colorbar;  title('Imphase - PGN');
 subplot(3,6,12); imagesc(imphase_PGNR); axis image; axis off; colorbar;  title('Imphase - PGNR');
 
 subplot(3,6,13); imagesc(imphasor_GD); axis image; axis off; colorbar;  title('Imphasor - GD');

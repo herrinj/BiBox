@@ -9,7 +9,7 @@ n = 256^2;
 upper_bound  = ones(n,1);
 lower_bound  = zeros(n,1);
 tolJ         = 1e-4;            
-tolY         = 1e-3;           
+tolY         = 5e-3;           
 tolG         = 1e1;
 tolN         = 1e-3;
 maxIter      = 100;
@@ -47,8 +47,8 @@ ROF_imphase_GN       = zeros(runs,1);
 ROF_imphasor_GN      = zeros(runs,1);
 ROF_imphase_PGN      = zeros(runs,1);
 ROF_imphasor_PGN     = zeros(runs,1);
-ROF_imphase_PGNR      = zeros(runs,1);
-ROF_imphasor_PGNR     = zeros(runs,1);
+ROF_imphase_PGNR     = zeros(runs,1);
+ROF_imphasor_PGNR    = zeros(runs,1);
 
 RE_imphase_GD       = zeros(runs,1);
 RE_imphasor_GD      = zeros(runs,1);
@@ -375,101 +375,118 @@ end
 
 %%
 % Print some results to the terminal window
+clc;
 
 fprintf('\n***** Relative Obj. Fctn. Minima *****\n');
 fprintf('min(ROF_imphase_GD)     = %1.4e \n', sum(ROF_imphase_GD)/runs);
-fprintf('min(ROF_imphasor_GD)    = %1.4e \n', sum(ROF_imphasor_GD)/runs);
 fprintf('min(ROF_imphase_NLCG)   = %1.4e \n', sum(ROF_imphase_NLCG)/runs);
-fprintf('min(ROF_imphasor_NLCG)  = %1.4e \n', sum(ROF_imphasor_NLCG)/runs);
 fprintf('min(ROF_imphase_LBFGS)  = %1.4e \n', sum(ROF_imphase_BFGS)/runs);
-fprintf('min(ROF_imphasor_LBFGS) = %1.4e \n', sum(ROF_imphasor_BFGS)/runs);
 fprintf('min(ROF_imphase_GN)     = %1.4e \n', sum(ROF_imphase_GN)/runs);
-fprintf('min(ROF_imphasor_GN)    = %1.4e \n', sum(ROF_imphasor_GN)/runs);
 fprintf('min(ROF_imphase_PGN)    = %1.4e \n', sum(ROF_imphase_PGN)/runs);
-fprintf('min(ROF_imphasor_PGN)   = %1.4e \n', sum(ROF_imphasor_PGN)/runs);
 fprintf('min(ROF_imphase_PGNR)   = %1.4e \n', sum(ROF_imphase_PGNR)/runs);
-fprintf('min(ROF_imphasor_PGNR)  = %1.4e \n', sum(ROF_imphasor_PGNR)/runs);
 
 fprintf('\n***** Relative Error Minima *****\n');
 fprintf('min(RE_imphase_GD)     = %1.4e \n', sum(RE_imphase_GD)/runs);
-fprintf('min(RE_imphasor_GD)    = %1.4e \n', sum(RE_imphasor_GD)/runs);
 fprintf('min(RE_imphase_NLCG)   = %1.4e \n', sum(RE_imphase_NLCG)/runs);
-fprintf('min(RE_imphasor_NLCG)  = %1.4e \n', sum(RE_imphasor_NLCG)/runs);
 fprintf('min(RE_imphase_LBFGS)  = %1.4e \n', sum(RE_imphase_BFGS)/runs);
-fprintf('min(RE_imphasor_LBFGS) = %1.4e \n', sum(RE_imphasor_BFGS)/runs);
 fprintf('min(RE_imphase_GN)     = %1.4e \n', sum(RE_imphase_GN)/runs);
-fprintf('min(RE_imphasor_GN)    = %1.4e \n', sum(RE_imphasor_GN)/runs);
 fprintf('min(RE_imphase_PGN)    = %1.4e \n', sum(RE_imphase_PGN)/runs);
-fprintf('min(RE_imphasor_PGN)   = %1.4e \n', sum(RE_imphasor_PGN)/runs);
 fprintf('min(RE_imphase_PGNR)   = %1.4e \n', sum(RE_imphase_PGNR)/runs);
-fprintf('min(RE_imphasor_PGNR)  = %1.4e \n', sum(RE_imphasor_PGNR)/runs);
 
 fprintf('\n***** Normalized Cross-Correlation Minima *****\n');
 fprintf('min(NCC_imphase_GD)    = %1.4e \n', sum(NCC_imphase_GD)/runs);
-fprintf('min(NCC_imphasor_GD)   = %1.4e \n', sum(NCC_imphasor_GD)/runs);
 fprintf('min(NCC_imphase_NLCG)  = %1.4e \n', sum(NCC_imphase_NLCG)/runs);
-fprintf('min(NCC_imphasor_NLCG) = %1.4e \n', sum(NCC_imphasor_NLCG)/runs);
 fprintf('min(NCC_imphase_LBFGS) = %1.4e \n', sum(NCC_imphase_BFGS)/runs);
-fprintf('min(NCC_imphasor_LBFGS)= %1.4e \n', sum(NCC_imphasor_BFGS)/runs);
 fprintf('min(NCC_imphase_GN)    = %1.4e \n', sum(NCC_imphase_GN)/runs);
-fprintf('min(NCC_imphasor_GN)   = %1.4e \n', sum(NCC_imphasor_GN)/runs);
 fprintf('min(NCC_imphase_PGN)   = %1.4e \n', sum(NCC_imphase_PGN)/runs);
-fprintf('min(NCC_imphasor_PGN)  = %1.4e \n', sum(NCC_imphasor_PGN)/runs);
 fprintf('min(NCC_imphase_PGNR)  = %1.4e \n', sum(NCC_imphase_PGNR)/runs);
-fprintf('min(NCC_imphasor_PGNR) = %1.4e \n', sum(NCC_imphasor_PGNR)/runs);
-
-fprintf('\n***** Total Time Elapsed *****\n');
-fprintf('time(imphase_GD)       = %1.4e \n', sum(time_imphase_GD)/runs);
-fprintf('time(imphasor_GD)      = %1.4e \n', sum(time_imphasor_GD)/runs);
-fprintf('time(imphase_NLCG)     = %1.4e \n', sum(time_imphase_NLCG)/runs);
-fprintf('time(imphasor_NLCG)    = %1.4e \n', sum(time_imphasor_NLCG)/runs);
-fprintf('time(imphase_LBFGS)    = %1.4e \n', sum(time_imphase_BFGS)/runs);
-fprintf('time(imphasor_LBFGS)   = %1.4e \n', sum(time_imphasor_BFGS)/runs);
-fprintf('time(imphase_GN)       = %1.4e \n', sum(time_imphase_GN)/runs);
-fprintf('time(imphasor_GN)      = %1.4e \n', sum(time_imphasor_GN)/runs);
-fprintf('time(imphase_PGN)      = %1.4e \n', sum(time_imphase_PGN)/runs);
-fprintf('time(imphasor_PGN)     = %1.4e \n', sum(time_imphasor_PGN)/runs);
-fprintf('time(imphase_PGNR)     = %1.4e \n', sum(time_imphase_PGNR)/runs);
-fprintf('time(imphasor_PGNR)    = %1.4e \n', sum(time_imphasor_PGNR)/runs);
-
-fprintf('\n***** Time per Iteration *****\n');
-fprintf('time(imphase_GD)/its    = %1.4e \n', sum(time_imphase_GD)/sum(its_imphase_GD));
-fprintf('time(imphasor_GD)/its   = %1.4e \n', sum(time_imphasor_GD)/sum(its_imphasor_GD));
-fprintf('time(imphase_NLCG)/its  = %1.4e \n', sum(time_imphase_NLCG)/sum(its_imphase_NLCG));
-fprintf('time(imphasor_NLCG)/its = %1.4e \n', sum(time_imphasor_NLCG)/sum(its_imphasor_NLCG));
-fprintf('time(imphase_LBFGS)/its = %1.4e \n', sum(time_imphase_BFGS)/sum(its_imphase_BFGS));
-fprintf('time(imphasor_LBFGS)/its= %1.4e \n', sum(time_imphasor_BFGS)/sum(its_imphasor_BFGS));
-fprintf('time(imphase_GN)/its    = %1.4e \n', sum(time_imphase_GN)/sum(its_imphase_GN));
-fprintf('time(imphasor_GN)/its   = %1.4e \n', sum(time_imphasor_GN)/sum(its_imphasor_GN));
-fprintf('time(imphase_PGN)/its   = %1.4e \n', sum(time_imphase_PGN)/sum(its_imphase_PGN));
-fprintf('time(imphasor_PGN)/its  = %1.4e \n', sum(time_imphasor_PGN)/sum(its_imphasor_PGN));
-fprintf('time(imphase_PGNR)/its  = %1.4e \n', sum(time_imphase_PGNR)/sum(its_imphase_PGNR));
-fprintf('time(imphasor_PGNR)/its = %1.4e \n', sum(time_imphasor_PGNR)/sum(its_imphasor_PGNR));
 
 fprintf('\n***** Outer Iterations til Convergence *****\n');
 fprintf('iters(imphase_GD)      = %.1f \n', sum(its_imphase_GD)/runs);
-fprintf('iters(imphasor_GD)     = %.1f \n', sum(its_imphasor_GD)/runs);
 fprintf('iters(imphase_NLCG)    = %.1f \n', sum(its_imphase_NLCG)/runs);
-fprintf('iters(imphasor_NLCG)   = %.1f \n', sum(its_imphasor_NLCG)/runs);
 fprintf('iters(imphase_LBFGS)   = %.1f \n', sum(its_imphase_BFGS)/runs);
-fprintf('iters(imphasor_LBFGS)  = %.1f \n', sum(its_imphasor_BFGS)/runs);
 fprintf('iters(imphase_GN)      = %.1f \n', sum(its_imphase_GN)/runs);
-fprintf('iters(imphasor_GN)     = %.1f \n', sum(its_imphasor_GN)/runs);
 fprintf('iters(imphase_PGN)     = %.1f \n', sum(its_imphase_PGN)/runs);
-fprintf('iters(imphasor_PGN)    = %.1f \n', sum(its_imphasor_PGN)/runs);
 fprintf('iters(imphase_PGNR)    = %.1f \n', sum(its_imphase_PGNR)/runs);
-fprintf('iters(imphasor_PGNR)   = %.1f \n', sum(its_imphasor_PGNR)/runs);
+
+fprintf('\n***** Total Time Elapsed *****\n');
+fprintf('time(imphase_GD)       = %1.4e \n', sum(time_imphase_GD)/runs);
+fprintf('time(imphase_NLCG)     = %1.4e \n', sum(time_imphase_NLCG)/runs);
+fprintf('time(imphase_LBFGS)    = %1.4e \n', sum(time_imphase_BFGS)/runs);
+fprintf('time(imphase_GN)       = %1.4e \n', sum(time_imphase_GN)/runs);
+fprintf('time(imphase_PGN)      = %1.4e \n', sum(time_imphase_PGN)/runs);
+fprintf('time(imphase_PGNR)     = %1.4e \n', sum(time_imphase_PGNR)/runs);
+
+fprintf('\n***** Time per Iteration *****\n');
+fprintf('time(imphase_GD)/its    = %1.4e \n', sum(time_imphase_GD)/sum(its_imphase_GD));
+fprintf('time(imphase_NLCG)/its  = %1.4e \n', sum(time_imphase_NLCG)/sum(its_imphase_NLCG));
+fprintf('time(imphase_LBFGS)/its = %1.4e \n', sum(time_imphase_BFGS)/sum(its_imphase_BFGS));
+fprintf('time(imphase_GN)/its    = %1.4e \n', sum(time_imphase_GN)/sum(its_imphase_GN));
+fprintf('time(imphase_PGN)/its   = %1.4e \n', sum(time_imphase_PGN)/sum(its_imphase_PGN));
+fprintf('time(imphase_PGNR)/its  = %1.4e \n', sum(time_imphase_PGNR)/sum(its_imphase_PGNR));
 
 fprintf('\n***** Avg. Line Search Iterations per Outer Iteration *****\n');
 fprintf('LS(imphase_GD)/its     = %1.1f \n', sum(LS_imphase_GD)/sum(its_imphase_GD));
-fprintf('LS(imphasor_GD)/its    = %1.1f \n', sum(LS_imphasor_GD)/sum(its_imphasor_GD));
 fprintf('LS(imphase_NLCG)/its   = %1.1f \n', sum(LS_imphase_NLCG)/sum(its_imphase_NLCG));
-fprintf('LS(imphasor_NLCG)/its  = %1.1f \n', sum(LS_imphasor_NLCG)/sum(its_imphasor_NLCG));
 fprintf('LS(imphase_LBFGS)/its  = %1.1f \n', sum(LS_imphase_BFGS)/sum(its_imphase_BFGS));
-fprintf('LS(imphasor_LBFGS)/its = %1.1f \n', sum(LS_imphasor_BFGS)/sum(its_imphasor_BFGS));
 fprintf('LS(imphase_GN)/its     = %1.1f \n', sum(LS_imphase_GN)/sum(its_imphase_GN));
-fprintf('LS(imphasor_GN)/its    = %1.1f \n', sum(LS_imphasor_GN)/sum(its_imphasor_GN));
 fprintf('LS(imphase_PGN)/its    = %1.1f \n', sum(LS_imphase_PGN)/sum(its_imphase_PGN));
-fprintf('LS(imphasor_PGN)/its   = %1.1f \n', sum(LS_imphasor_PGN)/sum(its_imphasor_PGN));
 fprintf('LS(imphase_PGNR)/its   = %1.1f \n', sum(LS_imphase_PGNR)/sum(its_imphase_PGNR));
+
+
+
+fprintf('\n***** Relative Obj. Fctn. Minima *****\n');
+fprintf('min(ROF_imphasor_GD)    = %1.4e \n', sum(ROF_imphasor_GD)/runs);
+fprintf('min(ROF_imphasor_NLCG)  = %1.4e \n', sum(ROF_imphasor_NLCG)/runs);
+fprintf('min(ROF_imphasor_LBFGS) = %1.4e \n', sum(ROF_imphasor_BFGS)/runs);
+fprintf('min(ROF_imphasor_GN)    = %1.4e \n', sum(ROF_imphasor_GN)/runs);
+fprintf('min(ROF_imphasor_PGN)   = %1.4e \n', sum(ROF_imphasor_PGN)/runs);
+fprintf('min(ROF_imphasor_PGNR)  = %1.4e \n', sum(ROF_imphasor_PGNR)/runs);
+
+fprintf('\n***** Relative Error Minima *****\n');
+fprintf('min(RE_imphasor_GD)    = %1.4e \n', sum(RE_imphasor_GD)/runs);
+fprintf('min(RE_imphasor_NLCG)  = %1.4e \n', sum(RE_imphasor_NLCG)/runs);
+fprintf('min(RE_imphasor_LBFGS) = %1.4e \n', sum(RE_imphasor_BFGS)/runs);
+fprintf('min(RE_imphasor_GN)    = %1.4e \n', sum(RE_imphasor_GN)/runs);
+fprintf('min(RE_imphasor_PGN)   = %1.4e \n', sum(RE_imphasor_PGN)/runs);
+fprintf('min(RE_imphasor_PGNR)  = %1.4e \n', sum(RE_imphasor_PGNR)/runs);
+
+fprintf('\n***** Normalized Cross-Correlation Minima *****\n');
+fprintf('min(NCC_imphasor_GD)   = %1.4e \n', sum(NCC_imphasor_GD)/runs);
+fprintf('min(NCC_imphasor_NLCG) = %1.4e \n', sum(NCC_imphasor_NLCG)/runs);
+fprintf('min(NCC_imphasor_LBFGS)= %1.4e \n', sum(NCC_imphasor_BFGS)/runs);
+fprintf('min(NCC_imphasor_GN)   = %1.4e \n', sum(NCC_imphasor_GN)/runs);
+fprintf('min(NCC_imphasor_PGN)  = %1.4e \n', sum(NCC_imphasor_PGN)/runs);
+fprintf('min(NCC_imphasor_PGNR) = %1.4e \n', sum(NCC_imphasor_PGNR)/runs);
+
+fprintf('\n***** Outer Iterations til Convergence *****\n');
+fprintf('iters(imphasor_GD)     = %.1f \n', sum(its_imphasor_GD)/runs);
+fprintf('iters(imphasor_NLCG)   = %.1f \n', sum(its_imphasor_NLCG)/runs);
+fprintf('iters(imphasor_LBFGS)  = %.1f \n', sum(its_imphasor_BFGS)/runs);
+fprintf('iters(imphasor_GN)     = %.1f \n', sum(its_imphasor_GN)/runs);
+fprintf('iters(imphasor_PGN)    = %.1f \n', sum(its_imphasor_PGN)/runs);
+fprintf('iters(imphasor_PGNR)   = %.1f \n', sum(its_imphasor_PGNR)/runs);
+
+fprintf('\n***** Total Time Elapsed *****\n');
+fprintf('time(imphasor_GD)      = %1.4e \n', sum(time_imphasor_GD)/runs);
+fprintf('time(imphasor_NLCG)    = %1.4e \n', sum(time_imphasor_NLCG)/runs);
+fprintf('time(imphasor_LBFGS)   = %1.4e \n', sum(time_imphasor_BFGS)/runs);
+fprintf('time(imphasor_GN)      = %1.4e \n', sum(time_imphasor_GN)/runs);
+fprintf('time(imphasor_PGN)     = %1.4e \n', sum(time_imphasor_PGN)/runs);
+fprintf('time(imphasor_PGNR)    = %1.4e \n', sum(time_imphasor_PGNR)/runs);
+
+fprintf('\n***** Time per Iteration *****\n');
+fprintf('time(imphasor_GD)/its   = %1.4e \n', sum(time_imphasor_GD)/sum(its_imphasor_GD));
+fprintf('time(imphasor_NLCG)/its = %1.4e \n', sum(time_imphasor_NLCG)/sum(its_imphasor_NLCG));
+fprintf('time(imphasor_LBFGS)/its= %1.4e \n', sum(time_imphasor_BFGS)/sum(its_imphasor_BFGS));
+fprintf('time(imphasor_GN)/its   = %1.4e \n', sum(time_imphasor_GN)/sum(its_imphasor_GN));
+fprintf('time(imphasor_PGN)/its  = %1.4e \n', sum(time_imphasor_PGN)/sum(its_imphasor_PGN));
+fprintf('time(imphasor_PGNR)/its = %1.4e \n', sum(time_imphasor_PGNR)/sum(its_imphasor_PGNR));
+
+fprintf('\n***** Avg. Line Search Iterations per Outer Iteration *****\n');
+fprintf('LS(imphasor_GD)/its    = %1.1f \n', sum(LS_imphasor_GD)/sum(its_imphasor_GD));
+fprintf('LS(imphasor_NLCG)/its  = %1.1f \n', sum(LS_imphasor_NLCG)/sum(its_imphasor_NLCG));
+fprintf('LS(imphasor_LBFGS)/its = %1.1f \n', sum(LS_imphasor_BFGS)/sum(its_imphasor_BFGS));
+fprintf('LS(imphasor_GN)/its    = %1.1f \n', sum(LS_imphasor_GN)/sum(its_imphasor_GN));
+fprintf('LS(imphasor_PGN)/its   = %1.1f \n', sum(LS_imphasor_PGN)/sum(its_imphasor_PGN));
 fprintf('LS(imphasor_PGNR)/its  = %1.1f \n', sum(LS_imphasor_PGNR)/sum(its_imphasor_PGNR));

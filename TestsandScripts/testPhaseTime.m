@@ -7,9 +7,9 @@ clear all; close all;
 % Setup Gauss-Newton parameters
 n = 256^2;
 tolJ         = 1e-4;            
-tolY         = 1e-3;           
+tolY         = 1e-4;           
 tolG         = 1e1;
-tolN         = 1e-3;
+tolN         = 5e-3;
 maxIter      = 100;
 solverMaxIter= 250;              
 solverTol    = 1e-1;
@@ -395,98 +395,116 @@ end
 
 fprintf('\n***** Relative Obj. Fctn. Minima *****\n');
 fprintf('min(ROF_phase_GD)     = %1.4e \n', sum(ROF_phase_GD)/runs);
-fprintf('min(ROF_phasor_GD)    = %1.4e \n', sum(ROF_phasor_GD)/runs);
 fprintf('min(ROF_phase_NLCG)   = %1.4e \n', sum(ROF_phase_NLCG)/runs);
-fprintf('min(ROF_phasor_NLCG)  = %1.4e \n', sum(ROF_phasor_NLCG)/runs);
 fprintf('min(ROF_phase_LBFGS)  = %1.4e \n', sum(ROF_phase_BFGS)/runs);
-fprintf('min(ROF_phasor_LBFGS) = %1.4e \n', sum(ROF_phasor_BFGS)/runs);
 fprintf('min(ROF_phase_GNF)    = %1.4e \n', sum(ROF_phase_GNF)/runs);
-fprintf('min(ROF_phasor_GNF)   = %1.4e \n', sum(ROF_phasor_GNF)/runs);
 fprintf('min(ROF_phase_GNT)    = %1.4e \n', sum(ROF_phase_GNT)/runs);
-fprintf('min(ROF_phasor_GNT)   = %1.4e \n', sum(ROF_phasor_GNT)/runs);
 fprintf('min(ROF_phase_GNI)    = %1.4e \n', sum(ROF_phase_GNI)/runs);
-fprintf('min(ROF_phasor_GNI)   = %1.4e \n', sum(ROF_phasor_GNI)/runs);
 
 fprintf('\n***** Relative Error Minima *****\n');
 fprintf('min(RE_phase_GD)     = %1.4e \n', sum(RE_phase_GD)/runs);
-fprintf('min(RE_phasor_GD)    = %1.4e \n', sum(RE_phasor_GD)/runs);
 fprintf('min(RE_phase_NLCG)   = %1.4e \n', sum(RE_phase_NLCG)/runs);
-fprintf('min(RE_phasor_NLCG)  = %1.4e \n', sum(RE_phasor_NLCG)/runs);
 fprintf('min(RE_phase_LBFGS)  = %1.4e \n', sum(RE_phase_BFGS)/runs);
-fprintf('min(RE_phasor_LBFGS) = %1.4e \n', sum(RE_phasor_BFGS)/runs);
 fprintf('min(RE_phase_GNF)    = %1.4e \n', sum(RE_phase_GNF)/runs);
-fprintf('min(RE_phasor_GNF)   = %1.4e \n', sum(RE_phasor_GNF)/runs);
 fprintf('min(RE_phase_GNT)    = %1.4e \n', sum(RE_phase_GNT)/runs);
-fprintf('min(RE_phasor_GNT)   = %1.4e \n', sum(RE_phasor_GNT)/runs);
 fprintf('min(RE_phase_GNI)    = %1.4e \n', sum(RE_phase_GNI)/runs);
-fprintf('min(RE_phasor_GNI)   = %1.4e \n', sum(RE_phasor_GNI)/runs);
 
 fprintf('\n***** Normalized Cross-Correlation Minima *****\n');
 fprintf('min(NCC_phase_GD)     = %1.4e \n', sum(NCC_phase_GD)/runs);
-fprintf('min(NCC_phasor_GD)    = %1.4e \n', sum(NCC_phasor_GD)/runs);
 fprintf('min(NCC_phase_NLCG)   = %1.4e \n', sum(NCC_phase_NLCG)/runs);
-fprintf('min(NCC_phasor_NLCG)  = %1.4e \n', sum(NCC_phasor_NLCG)/runs);
 fprintf('min(NCC_phase_LBFGS)  = %1.4e \n', sum(NCC_phase_BFGS)/runs);
-fprintf('min(NCC_phasor_LBFGS) = %1.4e \n', sum(NCC_phasor_BFGS)/runs);
 fprintf('min(NCC_phase_GNF)    = %1.4e \n', sum(NCC_phase_GNF)/runs);
-fprintf('min(NCC_phasor_GNF)   = %1.4e \n', sum(NCC_phasor_GNF)/runs);
 fprintf('min(NCC_phase_GNT)    = %1.4e \n', sum(NCC_phase_GNT)/runs);
-fprintf('min(NCC_phasor_GNT)   = %1.4e \n', sum(NCC_phasor_GNT)/runs);
 fprintf('min(NCC_phase_GNI)    = %1.4e \n', sum(NCC_phase_GNI)/runs);
-fprintf('min(NCC_phasor_GNI)   = %1.4e \n', sum(NCC_phasor_GNI)/runs);
-
-fprintf('\n***** Total Time Elapsed *****\n');
-fprintf('time(phase_GD)       = %1.4e \n', sum(time_phase_GD)/runs);
-fprintf('time(phasor_GD)      = %1.4e \n', sum(time_phasor_GD)/runs);
-fprintf('time(phase_NLCG)     = %1.4e \n', sum(time_phase_NLCG)/runs);
-fprintf('time(phasor_NLCG)    = %1.4e \n', sum(time_phasor_NLCG)/runs);
-fprintf('time(phase_LBFGS)    = %1.4e \n', sum(time_phase_BFGS)/runs);
-fprintf('time(phasor_LBFGS)   = %1.4e \n', sum(time_phasor_BFGS)/runs);
-fprintf('time(phase_GNF)      = %1.4e \n', sum(time_phase_GNF)/runs);
-fprintf('time(phasor_GNF)     = %1.4e \n', sum(time_phasor_GNF)/runs);
-fprintf('time(phase_GNT)      = %1.4e \n', sum(time_phase_GNT)/runs);
-fprintf('time(phasor_GNT)     = %1.4e \n', sum(time_phasor_GNT)/runs);
-fprintf('time(phase_GNI)      = %1.4e \n', sum(time_phase_GNI)/runs);
-fprintf('time(phasor_GNI)     = %1.4e \n', sum(time_phasor_GNI)/runs);
-
-fprintf('\n***** Time per Iteration *****\n');
-fprintf('time(phase_GD)/its     = %1.4e \n', sum(time_phase_GD)/sum(its_phase_GD));
-fprintf('time(phasor_GD)/its    = %1.4e \n', sum(time_phasor_GD)/sum(its_phasor_GD));
-fprintf('time(phase_NLCG)/its   = %1.4e \n', sum(time_phase_NLCG)/sum(its_phase_NLCG));
-fprintf('time(phasor_NLCG)/its  = %1.4e \n', sum(time_phasor_NLCG)/sum(its_phasor_NLCG));
-fprintf('time(phase_LBFGS)/its  = %1.4e \n', sum(time_phase_BFGS)/sum(its_phase_BFGS));
-fprintf('time(phasor_LBFGS)/its = %1.4e \n', sum(time_phasor_BFGS)/sum(its_phasor_BFGS));
-fprintf('time(phase_GNF)/its    = %1.4e \n', sum(time_phase_GNF)/sum(its_phase_GNF));
-fprintf('time(phasor_GNF)/its   = %1.4e \n', sum(time_phasor_GNF)/sum(its_phasor_GNF));
-fprintf('time(phase_GNT)/its    = %1.4e \n', sum(time_phase_GNT)/sum(its_phase_GNT));
-fprintf('time(phasor_GNT)/its   = %1.4e \n', sum(time_phasor_GNT)/sum(its_phasor_GNT));
-fprintf('time(phase_GNI)/its    = %1.4e \n', sum(time_phase_GNI)/sum(its_phase_GNI));
-fprintf('time(phasor_GNI)/its   = %1.4e \n', sum(time_phasor_GNI)/sum(its_phasor_GNI));
 
 fprintf('\n***** Outer Iterations til Convergence *****\n');
 fprintf('iters(phase_GD)      = %.1f \n', sum(its_phase_GD)/runs);
-fprintf('iters(phasor_GD)     = %.1f \n', sum(its_phasor_GD)/runs);
 fprintf('iters(phase_NLCG)    = %.1f \n', sum(its_phase_NLCG)/runs);
-fprintf('iters(phasor_NLCG)   = %.1f \n', sum(its_phasor_NLCG)/runs);
 fprintf('iters(phase_LBFGS)   = %.1f \n', sum(its_phase_BFGS)/runs);
-fprintf('iters(phasor_LBFGS)  = %.1f \n', sum(its_phasor_BFGS)/runs);
 fprintf('iters(phase_GNF)     = %.1f \n', sum(its_phase_GNF)/runs);
-fprintf('iters(phasor_GNF)    = %.1f \n', sum(its_phasor_GNF)/runs);
 fprintf('iters(phase_GNT)     = %.1f \n', sum(its_phase_GNT)/runs);
-fprintf('iters(phasor_GNT)    = %.1f \n', sum(its_phasor_GNT)/runs);
 fprintf('iters(phase_GNI)     = %.1f \n', sum(its_phase_GNI)/runs);
-fprintf('iters(phasor_GNI)    = %.1f \n', sum(its_phasor_GNI)/runs);
+
+fprintf('\n***** Total Time Elapsed *****\n');
+fprintf('time(phase_GD)       = %1.4e \n', sum(time_phase_GD)/runs);
+fprintf('time(phase_NLCG)     = %1.4e \n', sum(time_phase_NLCG)/runs);
+fprintf('time(phase_LBFGS)    = %1.4e \n', sum(time_phase_BFGS)/runs);
+fprintf('time(phase_GNF)      = %1.4e \n', sum(time_phase_GNF)/runs);
+fprintf('time(phase_GNT)      = %1.4e \n', sum(time_phase_GNT)/runs);
+fprintf('time(phase_GNI)      = %1.4e \n', sum(time_phase_GNI)/runs);
+
+fprintf('\n***** Time per Iteration *****\n');
+fprintf('time(phase_GD)/its     = %1.4e \n', sum(time_phase_GD)/sum(its_phase_GD));
+fprintf('time(phase_NLCG)/its   = %1.4e \n', sum(time_phase_NLCG)/sum(its_phase_NLCG));
+fprintf('time(phase_LBFGS)/its  = %1.4e \n', sum(time_phase_BFGS)/sum(its_phase_BFGS));
+fprintf('time(phase_GNF)/its    = %1.4e \n', sum(time_phase_GNF)/sum(its_phase_GNF));
+fprintf('time(phase_GNT)/its    = %1.4e \n', sum(time_phase_GNT)/sum(its_phase_GNT));
+fprintf('time(phase_GNI)/its    = %1.4e \n', sum(time_phase_GNI)/sum(its_phase_GNI));
 
 fprintf('\n***** Avg. Line Search Iterations per Outer Iteration *****\n');
 fprintf('LS(phase_GD)/its     = %1.1f \n', sum(LS_phase_GD)/sum(its_phase_GD));
-fprintf('LS(phasor_GD)/its    = %1.1f \n', sum(LS_phasor_GD)/sum(its_phasor_GD));
 fprintf('LS(phase_NLCG)/its   = %1.1f \n', sum(LS_phase_NLCG)/sum(its_phase_NLCG));
-fprintf('LS(phasor_NLCG)/its  = %1.1f \n', sum(LS_phasor_NLCG)/sum(its_phasor_NLCG));
 fprintf('LS(phase_LBFGS)/its  = %1.1f \n', sum(LS_phase_BFGS)/sum(its_phase_BFGS));
-fprintf('LS(phasor_LBFGS)/its = %1.1f \n', sum(LS_phasor_BFGS)/sum(its_phasor_BFGS));
 fprintf('LS(phase_GNF)/its    = %1.1f \n', sum(LS_phase_GNF)/sum(its_phase_GNF));
-fprintf('LS(phasor_GNF)/its   = %1.1f \n', sum(LS_phasor_GNF)/sum(its_phasor_GNF));
 fprintf('LS(phase_GNT)/its    = %1.1f \n', sum(LS_phase_GNT)/sum(its_phase_GNT));
-fprintf('LS(phasor_GNT)/its   = %1.1f \n', sum(LS_phasor_GNT)/sum(its_phasor_GNT));
 fprintf('LS(phase_GNI)/its    = %1.1f \n', sum(LS_phase_GNI)/sum(its_phase_GNI));
+
+
+
+fprintf('\n***** Relative Obj. Fctn. Minima *****\n');
+fprintf('min(ROF_phasor_GD)    = %1.4e \n', sum(ROF_phasor_GD)/runs);
+fprintf('min(ROF_phasor_NLCG)  = %1.4e \n', sum(ROF_phasor_NLCG)/runs);
+fprintf('min(ROF_phasor_LBFGS) = %1.4e \n', sum(ROF_phasor_BFGS)/runs);
+fprintf('min(ROF_phasor_GNF)   = %1.4e \n', sum(ROF_phasor_GNF)/runs);
+fprintf('min(ROF_phasor_GNT)   = %1.4e \n', sum(ROF_phasor_GNT)/runs);
+fprintf('min(ROF_phasor_GNI)   = %1.4e \n', sum(ROF_phasor_GNI)/runs);
+
+fprintf('\n***** Relative Error Minima *****\n');
+fprintf('min(RE_phasor_GD)    = %1.4e \n', sum(RE_phasor_GD)/runs);
+fprintf('min(RE_phasor_NLCG)  = %1.4e \n', sum(RE_phasor_NLCG)/runs);
+fprintf('min(RE_phasor_LBFGS) = %1.4e \n', sum(RE_phasor_BFGS)/runs);
+fprintf('min(RE_phasor_GNF)   = %1.4e \n', sum(RE_phasor_GNF)/runs);
+fprintf('min(RE_phasor_GNT)   = %1.4e \n', sum(RE_phasor_GNT)/runs);
+fprintf('min(RE_phasor_GNI)   = %1.4e \n', sum(RE_phasor_GNI)/runs);
+
+fprintf('\n***** Normalized Cross-Correlation Minima *****\n');
+fprintf('min(NCC_phasor_GD)    = %1.4e \n', sum(NCC_phasor_GD)/runs);
+fprintf('min(NCC_phasor_NLCG)  = %1.4e \n', sum(NCC_phasor_NLCG)/runs);
+fprintf('min(NCC_phasor_LBFGS) = %1.4e \n', sum(NCC_phasor_BFGS)/runs);
+fprintf('min(NCC_phasor_GNF)   = %1.4e \n', sum(NCC_phasor_GNF)/runs);
+fprintf('min(NCC_phasor_GNT)   = %1.4e \n', sum(NCC_phasor_GNT)/runs);
+fprintf('min(NCC_phasor_GNI)   = %1.4e \n', sum(NCC_phasor_GNI)/runs);
+
+fprintf('\n***** Outer Iterations til Convergence *****\n');
+fprintf('iters(phasor_GD)     = %.1f \n', sum(its_phasor_GD)/runs);
+fprintf('iters(phasor_NLCG)   = %.1f \n', sum(its_phasor_NLCG)/runs);
+fprintf('iters(phasor_LBFGS)  = %.1f \n', sum(its_phasor_BFGS)/runs);
+fprintf('iters(phasor_GNF)    = %.1f \n', sum(its_phasor_GNF)/runs);
+fprintf('iters(phasor_GNT)    = %.1f \n', sum(its_phasor_GNT)/runs);
+fprintf('iters(phasor_GNI)    = %.1f \n', sum(its_phasor_GNI)/runs);
+
+fprintf('\n***** Total Time Elapsed *****\n');
+fprintf('time(phasor_GD)      = %1.4e \n', sum(time_phasor_GD)/runs);
+fprintf('time(phasor_NLCG)    = %1.4e \n', sum(time_phasor_NLCG)/runs);
+fprintf('time(phasor_LBFGS)   = %1.4e \n', sum(time_phasor_BFGS)/runs);
+fprintf('time(phasor_GNF)     = %1.4e \n', sum(time_phasor_GNF)/runs);
+fprintf('time(phasor_GNT)     = %1.4e \n', sum(time_phasor_GNT)/runs);
+fprintf('time(phasor_GNI)     = %1.4e \n', sum(time_phasor_GNI)/runs);
+
+fprintf('\n***** Time per Iteration *****\n');
+fprintf('time(phasor_GD)/its    = %1.4e \n', sum(time_phasor_GD)/sum(its_phasor_GD));
+fprintf('time(phasor_NLCG)/its  = %1.4e \n', sum(time_phasor_NLCG)/sum(its_phasor_NLCG));
+fprintf('time(phasor_LBFGS)/its = %1.4e \n', sum(time_phasor_BFGS)/sum(its_phasor_BFGS));
+fprintf('time(phasor_GNF)/its   = %1.4e \n', sum(time_phasor_GNF)/sum(its_phasor_GNF));
+fprintf('time(phasor_GNT)/its   = %1.4e \n', sum(time_phasor_GNT)/sum(its_phasor_GNT));
+fprintf('time(phasor_GNI)/its   = %1.4e \n', sum(time_phasor_GNI)/sum(its_phasor_GNI));
+
+fprintf('\n***** Avg. Line Search Iterations per Outer Iteration *****\n');
+fprintf('LS(phasor_GD)/its    = %1.1f \n', sum(LS_phasor_GD)/sum(its_phasor_GD));
+fprintf('LS(phasor_NLCG)/its  = %1.1f \n', sum(LS_phasor_NLCG)/sum(its_phasor_NLCG));
+fprintf('LS(phasor_LBFGS)/its = %1.1f \n', sum(LS_phasor_BFGS)/sum(its_phasor_BFGS));
+fprintf('LS(phasor_GNF)/its   = %1.1f \n', sum(LS_phasor_GNF)/sum(its_phasor_GNF));
+fprintf('LS(phasor_GNT)/its   = %1.1f \n', sum(LS_phasor_GNT)/sum(its_phasor_GNT));
 fprintf('LS(phasor_GNI)/its   = %1.1f \n', sum(LS_phasor_GNI)/sum(its_phasor_GNI));
+
+

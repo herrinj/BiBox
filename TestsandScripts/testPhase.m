@@ -7,7 +7,7 @@ clear all; close all;
 
 % Setup data
 path_SpeckleImagingCodes;
-[nfr, D_r0, image_name, K_n, sigma_rn] = setupBispectrumParams('nfr',50,'D_r0',30);
+[nfr, D_r0, image_name, K_n, sigma_rn] = setupBispectrumParams('nfr',100,'D_r0',30);
 setupBispectrumData;
 image_recur = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*phase_recur(:)),[256 256])))));
 dims = size(image_recur);
@@ -18,9 +18,9 @@ avg_data_frame = sum(data,3)/size(data,3); avg_data_frame = avg_data_frame/max(a
 upper_bound = ones(numel(image_proj),1);
 lower_bound = zeros(numel(image_proj),1);
 tolJ         = 1e-4;            
-tolY         = 1e-3;           
-tolG         = 1e3;
-tolN         = 1e-3;
+tolY         = 1e-4;           
+tolG         = 1e1;
+tolN         = 5e-3;
 maxIter      = 100;
 solverMaxIter= 250;              
 solverTol    = 1e-1;
@@ -197,7 +197,7 @@ image_GNT       = image_GNT/max(image_GNT(:));
 image_GNI       = image_GNI/max(image_GNI(:));
 imagor_GD       = imagor_GD/max(imagor_GD(:));
 imagor_NLCG     = imagor_NLCG/max(imagor_NLCG(:));
-imagor_BFGS    = imagor_BFGS/max(imagor_BFGS(:));
+imagor_BFGS     = imagor_BFGS/max(imagor_BFGS(:));
 imagor_GNF      = imagor_GNF/max(imagor_GNF(:));
 imagor_GNT      = imagor_GNT/max(imagor_GNT(:));
 imagor_GNI      = imagor_GNI/max(imagor_GNI(:));
@@ -399,7 +399,7 @@ plot((0:length(RE_phasor_GNI)-1)',  RE_phasor_GNI);
 leg = legend('E1-GD','E2-GD','E1-NLCG','E2-NLCG','E1-LBFGS','E2-LBFGS',...
              'E1-GNF', 'E2-GNF','E1-GNT','E2-GNT','E1-GNI','E2-GNI');
 leg.FontSize = 14;
-tit = title('RE: $\frac{\|x-x_{true}\|^2}{\|x_{true}\|^2}$','interpreter','latex')
+tit = title('RE: $\frac{\|x-x_{true}\|^2}{\|x_{true}\|^2}$','interpreter','latex');
 tit.FontSize = 16;
 
 %%
