@@ -17,7 +17,7 @@ avg_data_frame = sum(data,3)/size(data,3); avg_data_frame = avg_data_frame/max(a
 upper_bound = inf*ones(numel(image_proj),1);
 lower_bound = zeros(numel(image_proj),1);
 tolJ         = 1e-4;            
-tolY         = 5e-3;           
+tolY         = 1e-4;           
 tolG         = 1e1;
 tolN         = 1e-3;
 maxIter      = 100;
