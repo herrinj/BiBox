@@ -15,19 +15,22 @@ tolN         = 1e-3;
 maxIter      = 100;
 solverMaxIter= 250;              
 solverTol    = 1e-1;
-alphaPos     = 1e5;
+alphaPos     = 1e3;
 alphaGrad    = 1e-2;
+alphaTV      = 1e4;
 
 %%
 % Set up loop of runs
 
-runs = 50;
+runs = 10;
 
 % Alot memory
 sol_imphase_GD       = zeros(n,runs);
 sol_imphasor_GD      = zeros(n,runs);
-sol_imphase_NLCG     = zeros(n,runs);
-sol_imphasor_NLCG    = zeros(n,runs);
+sol_imphase_PGD      = zeros(n,runs);
+sol_imphasor_PGD     = zeros(n,runs);
+% sol_imphase_NLCG     = zeros(n,runs);
+% sol_imphasor_NLCG    = zeros(n,runs);
 sol_imphase_BFGS     = zeros(n,runs);
 sol_imphasor_BFGS    = zeros(n,runs);
 sol_imphase_GN       = zeros(n,runs);
@@ -39,8 +42,10 @@ sol_imphasor_PGNR    = zeros(n,runs);
 
 ROF_imphase_GD       = zeros(runs,1);
 ROF_imphasor_GD      = zeros(runs,1);
-ROF_imphase_NLCG     = zeros(runs,1);
-ROF_imphasor_NLCG    = zeros(runs,1);
+ROF_imphase_PGD      = zeros(runs,1);
+ROF_imphasor_PGD     = zeros(runs,1);
+% ROF_imphase_NLCG     = zeros(runs,1);
+% ROF_imphasor_NLCG    = zeros(runs,1);
 ROF_imphase_BFGS     = zeros(runs,1);
 ROF_imphasor_BFGS    = zeros(runs,1);
 ROF_imphase_GN       = zeros(runs,1);
@@ -52,8 +57,10 @@ ROF_imphasor_PGNR    = zeros(runs,1);
 
 RE_imphase_GD       = zeros(runs,1);
 RE_imphasor_GD      = zeros(runs,1);
-RE_imphase_NLCG     = zeros(runs,1);
-RE_imphasor_NLCG    = zeros(runs,1);
+RE_imphase_PGD      = zeros(runs,1);
+RE_imphasor_PGD     = zeros(runs,1);
+% RE_imphase_NLCG     = zeros(runs,1);
+% RE_imphasor_NLCG    = zeros(runs,1);
 RE_imphase_BFGS     = zeros(runs,1);
 RE_imphasor_BFGS    = zeros(runs,1);
 RE_imphase_GN       = zeros(runs,1);
@@ -65,8 +72,10 @@ RE_imphasor_PGNR    = zeros(runs,1);
 
 NCC_imphase_GD       = zeros(runs,1);
 NCC_imphasor_GD      = zeros(runs,1);
-NCC_imphase_NLCG     = zeros(runs,1);
-NCC_imphasor_NLCG    = zeros(runs,1);
+NCC_imphase_PGD      = zeros(runs,1);
+NCC_imphasor_PGD     = zeros(runs,1);
+% NCC_imphase_NLCG     = zeros(runs,1);
+% NCC_imphasor_NLCG    = zeros(runs,1);
 NCC_imphase_BFGS     = zeros(runs,1);
 NCC_imphasor_BFGS    = zeros(runs,1);
 NCC_imphase_GN       = zeros(runs,1);
@@ -78,8 +87,10 @@ NCC_imphasor_PGNR    = zeros(runs,1);
 
 time_imphase_GD       = zeros(runs,1);
 time_imphasor_GD      = zeros(runs,1);
-time_imphase_NLCG     = zeros(runs,1);
-time_imphasor_NLCG    = zeros(runs,1);
+time_imphase_PGD      = zeros(runs,1);
+time_imphasor_PGD     = zeros(runs,1);
+% time_imphase_NLCG     = zeros(runs,1);
+% time_imphasor_NLCG    = zeros(runs,1);
 time_imphase_BFGS     = zeros(runs,1);
 time_imphasor_BFGS    = zeros(runs,1);
 time_imphase_GN       = zeros(runs,1);
@@ -91,8 +102,10 @@ time_imphasor_PGNR    = zeros(runs,1);
 
 its_imphase_GD       = zeros(runs,1);
 its_imphasor_GD      = zeros(runs,1);
-its_imphase_NLCG     = zeros(runs,1);
-its_imphasor_NLCG    = zeros(runs,1);
+its_imphase_PGD      = zeros(runs,1);
+its_imphasor_PGD     = zeros(runs,1);
+% its_imphase_NLCG     = zeros(runs,1);
+% its_imphasor_NLCG    = zeros(runs,1);
 its_imphase_BFGS     = zeros(runs,1);
 its_imphasor_BFGS    = zeros(runs,1);
 its_imphase_GN       = zeros(runs,1);
@@ -104,8 +117,10 @@ its_imphasor_PGNR    = zeros(runs,1);
 
 LS_imphase_GD       = zeros(runs,1);
 LS_imphasor_GD      = zeros(runs,1);
-LS_imphase_NLCG     = zeros(runs,1);
-LS_imphasor_NLCG    = zeros(runs,1);
+LS_imphase_PGD      = zeros(runs,1);
+LS_imphasor_PGD     = zeros(runs,1);
+% LS_imphase_NLCG     = zeros(runs,1);
+% LS_imphasor_NLCG    = zeros(runs,1);
 LS_imphase_BFGS     = zeros(runs,1);
 LS_imphasor_BFGS    = zeros(runs,1);
 LS_imphase_GN       = zeros(runs,1);
@@ -151,7 +166,7 @@ for k = 1:runs
                                                     'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
                                                     'iterSave',true);                        
     time_imphasor_GD(k)  = toc();
-    imphasor_GD          = reshape(imphasor_GD, [256 256])/max(imphasor_GD(:));;
+    imphasor_GD          = reshape(imphasor_GD, [256 256])/max(imphasor_GD(:));
     s                    = measureShift(obj,imphasor_GD);
     imphasor_GD          = shiftImage(imphasor_GD,s);
     sol_imphasor_GD(:,k) = imphasor_GD(:);
@@ -161,40 +176,73 @@ for k = 1:runs
     clear GradientDescentProj;
     clear imphasorObjFctn;
 
-
-    % Run NLCG for imphase
-    fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaPos,'regularizer','pos','weights',weights);
+    % Run projected gradient descent for imphase
+    fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaGrad,'regularizer','grad','weights',weights);
     tic();
-    [imphase_NLCG, his_imphase_NLCG] = NonlinearCG(fctn, image_recur(:), 'maxIter',maxIter,...
-                                            'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
-                                            'iterSave',true);
-    time_imphase_NLCG(k)  = toc();
-    imphase_NLCG          = reshape(imphase_NLCG,[256 256])/max(imphase_NLCG(:));
-    s                     = measureShift(obj,imphase_NLCG);
-    imphase_NLCG          = shiftImage(imphase_NLCG,s);
-    sol_imphase_NLCG(:,k) = imphase_NLCG(:);
-    its_imphase_NLCG(k)   = size(his_imphase_NLCG.iters,2)-1;
-    LS_imphase_NLCG(k)    = sum(his_imphase_NLCG.array(:,5));
-    ROF_imphase_NLCG(k)   = his_imphase_NLCG.array(end,2)/his_imphase_NLCG.array(1,2);
-    clear NonlinearCG;
+    [imphase_PGD, his_imphase_PGD] = GradientDescentProj(fctn, image_proj(:),...
+                                                'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
+                                                'upper_bound',upper_bound,'lower_bound',lower_bound,'iterSave',true);
+    time_imphase_PGD(k)  = toc();
+    imphase_PGD          = reshape(imphase_PGD,[256 256])/max(imphase_PGD(:));
+    s                   = measureShift(obj,imphase_PGD);
+    imphase_PGD          = shiftImage(imphase_PGD,s);
+    sol_imphase_PGD(:,k) = imphase_PGD(:);
+    its_imphase_PGD(k)   = size(his_imphase_PGD.iters,2)-1;
+    LS_imphase_PGD(k)    = sum(his_imphase_PGD.array(:,6));
+    ROF_imphase_PGD(k)   = his_imphase_PGD.array(end,2)/his_imphase_PGD.array(1,2);
+    clear GradientDescentProj;
     clear imphaseObjFctn;
 
-    % Run NLCG for imphasor
-    fctn = @(x) imphasorObjFctn(x,A, bispec_phase,dims, pupil_mask,'alpha',alphaPos,'regularizer','pos','weights',weights);
+    % Run projected gradient descent for imphasor
+    fctn = @(x) imphasorObjFctn(x,A, bispec_phase,dims, pupil_mask,'alpha',alphaGrad,'regularizer','grad','weights',weights);
     tic();
-    [imphasor_NLCG, his_imphasor_NLCG] = NonlinearCG(fctn, image_recur(:),'maxIter',maxIter,...
-                                              'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
-                                              'iterSave',true);
-    time_imphasor_NLCG(k)  = toc();
-    imphasor_NLCG          = reshape(imphasor_NLCG, [256 256])/max(imphasor_NLCG(:));
-    s                      = measureShift(obj,imphasor_NLCG);
-    imphasor_NLCG          = shiftImage(imphasor_NLCG,s);
-    sol_imphasor_NLCG(:,k) = imphasor_NLCG(:);
-    its_imphasor_NLCG(k)   = size(his_imphasor_NLCG.iters,2)-1;
-    LS_imphasor_NLCG(k)    = sum(his_imphasor_NLCG.array(:,5));
-    ROF_imphasor_NLCG(k)   = his_imphasor_NLCG.array(end,2)/his_imphasor_NLCG.array(1,2);
-    clear NonlinearCG;
+    [imphasor_PGD, his_imphasor_PGD] = GradientDescentProj(fctn, image_proj(:),...
+                                                'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
+                                                'upper_bound',upper_bound,'lower_bound',lower_bound,'iterSave',true);                        
+    time_imphasor_PGD(k)  = toc();
+    imphasor_PGD          = reshape(imphasor_PGD, [256 256])/max(imphasor_PGD(:));
+    s                    = measureShift(obj,imphasor_PGD);
+    imphasor_PGD          = shiftImage(imphasor_PGD,s);
+    sol_imphasor_PGD(:,k) = imphasor_PGD(:);
+    its_imphasor_PGD(k)   = size(his_imphasor_PGD.iters,2)-1;
+    LS_imphasor_PGD(k)    = sum(his_imphasor_PGD.array(:,6));
+    ROF_imphasor_PGD(k)   = his_imphasor_PGD.array(end,2)/his_imphasor_PGD.array(1,2);
+    clear GradientDescentProj;
     clear imphasorObjFctn;
+
+    % Run NLCG for imphase
+%     fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaPos,'regularizer','pos','weights',weights);
+%     tic();
+%     [imphase_NLCG, his_imphase_NLCG] = NonlinearCG(fctn, image_recur(:), 'maxIter',maxIter,...
+%                                             'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
+%                                             'iterSave',true);
+%     time_imphase_NLCG(k)  = toc();
+%     imphase_NLCG          = reshape(imphase_NLCG,[256 256])/max(imphase_NLCG(:));
+%     s                     = measureShift(obj,imphase_NLCG);
+%     imphase_NLCG          = shiftImage(imphase_NLCG,s);
+%     sol_imphase_NLCG(:,k) = imphase_NLCG(:);
+%     its_imphase_NLCG(k)   = size(his_imphase_NLCG.iters,2)-1;
+%     LS_imphase_NLCG(k)    = sum(his_imphase_NLCG.array(:,5));
+%     ROF_imphase_NLCG(k)   = his_imphase_NLCG.array(end,2)/his_imphase_NLCG.array(1,2);
+%     clear NonlinearCG;
+%     clear imphaseObjFctn;
+
+    % Run NLCG for imphasor
+%     fctn = @(x) imphasorObjFctn(x,A, bispec_phase,dims, pupil_mask,'alpha',alphaPos,'regularizer','pos','weights',weights);
+%     tic();
+%     [imphasor_NLCG, his_imphasor_NLCG] = NonlinearCG(fctn, image_recur(:),'maxIter',maxIter,...
+%                                               'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
+%                                               'iterSave',true);
+%     time_imphasor_NLCG(k)  = toc();
+%     imphasor_NLCG          = reshape(imphasor_NLCG, [256 256])/max(imphasor_NLCG(:));
+%     s                      = measureShift(obj,imphasor_NLCG);
+%     imphasor_NLCG          = shiftImage(imphasor_NLCG,s);
+%     sol_imphasor_NLCG(:,k) = imphasor_NLCG(:);
+%     its_imphasor_NLCG(k)   = size(his_imphasor_NLCG.iters,2)-1;
+%     LS_imphasor_NLCG(k)    = sum(his_imphasor_NLCG.array(:,5));
+%     ROF_imphasor_NLCG(k)   = his_imphasor_NLCG.array(end,2)/his_imphasor_NLCG.array(1,2);
+%     clear NonlinearCG;
+%     clear imphasorObjFctn;
 
 
     % Run LBFGS for imphase
@@ -270,7 +318,7 @@ for k = 1:runs
 
 
     % Run projected Gauss-Newton for imphase
-    fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', 0.0,'regularizer','pos','weights',weights);
+    fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', 0,'regularizer','pos','weights',weights);
     tic();
     [imphase_PGN, his_imphase_PGN] = GaussNewtonProj(fctn, image_proj(:),...
                                                     'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -288,7 +336,7 @@ for k = 1:runs
     clear imphaseObjFctn;
 
     % Run projected Gauss-Newton for imphasor
-    fctn = @(x) imphasorObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', 0.0,'regularizer','pos','weights',weights);
+    fctn = @(x) imphasorObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', 0,'regularizer','pos','weights',weights);
     tic();
     [imphasor_PGN, his_imphasor_PGN] = GaussNewtonProj(fctn, image_proj(:),...
                                                       'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -347,9 +395,11 @@ end
 
 for k = 1:runs
     RE_imphase_GD(k)    = norm((sol_imphase_GD(:,k)) - obj(:))/norm(obj(:));   
-    RE_imphasor_GD(k)   = norm((sol_imphasor_GD(:,k)) - obj(:))/norm(obj(:));   
-    RE_imphase_NLCG(k)  = norm((sol_imphase_NLCG(:,k)) - obj(:))/norm(obj(:));  
-    RE_imphasor_NLCG(k) = norm((sol_imphasor_NLCG(:,k)) - obj(:))/norm(obj(:));  
+    RE_imphasor_GD(k)   = norm((sol_imphasor_GD(:,k)) - obj(:))/norm(obj(:));  
+    RE_imphase_PGD(k)    = norm((sol_imphase_PGD(:,k)) - obj(:))/norm(obj(:));   
+    RE_imphasor_PGD(k)   = norm((sol_imphasor_PGD(:,k)) - obj(:))/norm(obj(:)); 
+%     RE_imphase_NLCG(k)  = norm((sol_imphase_NLCG(:,k)) - obj(:))/norm(obj(:));  
+%     RE_imphasor_NLCG(k) = norm((sol_imphasor_NLCG(:,k)) - obj(:))/norm(obj(:));  
     RE_imphase_BFGS(k)  = norm((sol_imphase_BFGS(:,k)) - obj(:))/norm(obj(:));  
     RE_imphasor_BFGS(k) = norm((sol_imphasor_BFGS(:,k)) - obj(:))/norm(obj(:));  
     RE_imphase_GN(k)    = norm((sol_imphase_GN(:,k)) - obj(:))/norm(obj(:)); 
@@ -361,8 +411,10 @@ for k = 1:runs
     
     NCC_imphase_GD(k) = 0.5 - 0.5*((sol_imphase_GD(:,k)'*obj(:))^2/((sol_imphase_GD(:,k)'*sol_imphase_GD(:,k))*(obj(:)'*obj(:))));  
     NCC_imphasor_GD(k) = 0.5 - 0.5*((sol_imphasor_GD(:,k)'*obj(:))^2/((sol_imphasor_GD(:,k)'*sol_imphasor_GD(:,k))*(obj(:)'*obj(:))));  
-    NCC_imphase_NLCG(k) = 0.5 - 0.5*((sol_imphase_NLCG(:,k)'*obj(:))^2/((sol_imphase_NLCG(:,k)'*sol_imphase_NLCG(:,k))*(obj(:)'*obj(:))));  
-    NCC_imphasor_NLCG(k) = 0.5 - 0.5*((sol_imphasor_NLCG(:,k)'*obj(:))^2/((sol_imphasor_NLCG(:,k)'*sol_imphasor_NLCG(:,k))*(obj(:)'*obj(:))));  
+    NCC_imphase_PGD(k) = 0.5 - 0.5*((sol_imphase_PGD(:,k)'*obj(:))^2/((sol_imphase_PGD(:,k)'*sol_imphase_PGD(:,k))*(obj(:)'*obj(:))));  
+    NCC_imphasor_PGD(k) = 0.5 - 0.5*((sol_imphasor_PGD(:,k)'*obj(:))^2/((sol_imphasor_PGD(:,k)'*sol_imphasor_PGD(:,k))*(obj(:)'*obj(:))));  
+%     NCC_imphase_NLCG(k) = 0.5 - 0.5*((sol_imphase_NLCG(:,k)'*obj(:))^2/((sol_imphase_NLCG(:,k)'*sol_imphase_NLCG(:,k))*(obj(:)'*obj(:))));  
+%     NCC_imphasor_NLCG(k) = 0.5 - 0.5*((sol_imphasor_NLCG(:,k)'*obj(:))^2/((sol_imphasor_NLCG(:,k)'*sol_imphasor_NLCG(:,k))*(obj(:)'*obj(:))));  
     NCC_imphase_BFGS(k) = 0.5 - 0.5*((sol_imphase_BFGS(:,k)'*obj(:))^2/((sol_imphase_BFGS(:,k)'*sol_imphase_BFGS(:,k))*(obj(:)'*obj(:))));  
     NCC_imphasor_BFGS(k) = 0.5 - 0.5*((sol_imphasor_BFGS(:,k)'*obj(:))^2/((sol_imphasor_BFGS(:,k)'*sol_imphasor_BFGS(:,k))*(obj(:)'*obj(:))));  
     NCC_imphase_GN(k) = 0.5 - 0.5*((sol_imphase_GN(:,k)'*obj(:))^2/((sol_imphase_GN(:,k)'*sol_imphase_GN(:,k))*(obj(:)'*obj(:))));  
@@ -379,7 +431,7 @@ clc;
 
 fprintf('\n***** Relative Obj. Fctn. Minima *****\n');
 fprintf('min(ROF_imphase_GD)     = %1.4e \n', sum(ROF_imphase_GD)/runs);
-fprintf('min(ROF_imphase_NLCG)   = %1.4e \n', sum(ROF_imphase_NLCG)/runs);
+fprintf('min(ROF_imphase_PGD)    = %1.4e \n', sum(ROF_imphase_PGD)/runs);
 fprintf('min(ROF_imphase_LBFGS)  = %1.4e \n', sum(ROF_imphase_BFGS)/runs);
 fprintf('min(ROF_imphase_GN)     = %1.4e \n', sum(ROF_imphase_GN)/runs);
 fprintf('min(ROF_imphase_PGN)    = %1.4e \n', sum(ROF_imphase_PGN)/runs);
@@ -387,7 +439,7 @@ fprintf('min(ROF_imphase_PGNR)   = %1.4e \n', sum(ROF_imphase_PGNR)/runs);
 
 fprintf('\n***** Relative Error Minima *****\n');
 fprintf('min(RE_imphase_GD)     = %1.4e \n', sum(RE_imphase_GD)/runs);
-fprintf('min(RE_imphase_NLCG)   = %1.4e \n', sum(RE_imphase_NLCG)/runs);
+fprintf('min(RE_imphase_PGD)    = %1.4e \n', sum(RE_imphase_PGD)/runs);
 fprintf('min(RE_imphase_LBFGS)  = %1.4e \n', sum(RE_imphase_BFGS)/runs);
 fprintf('min(RE_imphase_GN)     = %1.4e \n', sum(RE_imphase_GN)/runs);
 fprintf('min(RE_imphase_PGN)    = %1.4e \n', sum(RE_imphase_PGN)/runs);
@@ -395,7 +447,7 @@ fprintf('min(RE_imphase_PGNR)   = %1.4e \n', sum(RE_imphase_PGNR)/runs);
 
 fprintf('\n***** Normalized Cross-Correlation Minima *****\n');
 fprintf('min(NCC_imphase_GD)    = %1.4e \n', sum(NCC_imphase_GD)/runs);
-fprintf('min(NCC_imphase_NLCG)  = %1.4e \n', sum(NCC_imphase_NLCG)/runs);
+fprintf('min(NCC_imphase_PGD)   = %1.4e \n', sum(NCC_imphase_PGD)/runs);
 fprintf('min(NCC_imphase_LBFGS) = %1.4e \n', sum(NCC_imphase_BFGS)/runs);
 fprintf('min(NCC_imphase_GN)    = %1.4e \n', sum(NCC_imphase_GN)/runs);
 fprintf('min(NCC_imphase_PGN)   = %1.4e \n', sum(NCC_imphase_PGN)/runs);
@@ -403,7 +455,7 @@ fprintf('min(NCC_imphase_PGNR)  = %1.4e \n', sum(NCC_imphase_PGNR)/runs);
 
 fprintf('\n***** Outer Iterations til Convergence *****\n');
 fprintf('iters(imphase_GD)      = %.1f \n', sum(its_imphase_GD)/runs);
-fprintf('iters(imphase_NLCG)    = %.1f \n', sum(its_imphase_NLCG)/runs);
+fprintf('iters(imphase_PGD)     = %.1f \n', sum(its_imphase_PGD)/runs);
 fprintf('iters(imphase_LBFGS)   = %.1f \n', sum(its_imphase_BFGS)/runs);
 fprintf('iters(imphase_GN)      = %.1f \n', sum(its_imphase_GN)/runs);
 fprintf('iters(imphase_PGN)     = %.1f \n', sum(its_imphase_PGN)/runs);
@@ -411,7 +463,7 @@ fprintf('iters(imphase_PGNR)    = %.1f \n', sum(its_imphase_PGNR)/runs);
 
 fprintf('\n***** Total Time Elapsed *****\n');
 fprintf('time(imphase_GD)       = %1.4e \n', sum(time_imphase_GD)/runs);
-fprintf('time(imphase_NLCG)     = %1.4e \n', sum(time_imphase_NLCG)/runs);
+fprintf('time(imphase_PGD)      = %1.4e \n', sum(time_imphase_PGD)/runs);
 fprintf('time(imphase_LBFGS)    = %1.4e \n', sum(time_imphase_BFGS)/runs);
 fprintf('time(imphase_GN)       = %1.4e \n', sum(time_imphase_GN)/runs);
 fprintf('time(imphase_PGN)      = %1.4e \n', sum(time_imphase_PGN)/runs);
@@ -419,7 +471,7 @@ fprintf('time(imphase_PGNR)     = %1.4e \n', sum(time_imphase_PGNR)/runs);
 
 fprintf('\n***** Time per Iteration *****\n');
 fprintf('time(imphase_GD)/its    = %1.4e \n', sum(time_imphase_GD)/sum(its_imphase_GD));
-fprintf('time(imphase_NLCG)/its  = %1.4e \n', sum(time_imphase_NLCG)/sum(its_imphase_NLCG));
+fprintf('time(imphase_PGD)/its   = %1.4e \n', sum(time_imphase_PGD)/sum(its_imphase_PGD));
 fprintf('time(imphase_LBFGS)/its = %1.4e \n', sum(time_imphase_BFGS)/sum(its_imphase_BFGS));
 fprintf('time(imphase_GN)/its    = %1.4e \n', sum(time_imphase_GN)/sum(its_imphase_GN));
 fprintf('time(imphase_PGN)/its   = %1.4e \n', sum(time_imphase_PGN)/sum(its_imphase_PGN));
@@ -427,7 +479,7 @@ fprintf('time(imphase_PGNR)/its  = %1.4e \n', sum(time_imphase_PGNR)/sum(its_imp
 
 fprintf('\n***** Avg. Line Search Iterations per Outer Iteration *****\n');
 fprintf('LS(imphase_GD)/its     = %1.1f \n', sum(LS_imphase_GD)/sum(its_imphase_GD));
-fprintf('LS(imphase_NLCG)/its   = %1.1f \n', sum(LS_imphase_NLCG)/sum(its_imphase_NLCG));
+fprintf('LS(imphase_PGD)/its    = %1.1f \n', sum(LS_imphase_PGD)/sum(its_imphase_PGD));
 fprintf('LS(imphase_LBFGS)/its  = %1.1f \n', sum(LS_imphase_BFGS)/sum(its_imphase_BFGS));
 fprintf('LS(imphase_GN)/its     = %1.1f \n', sum(LS_imphase_GN)/sum(its_imphase_GN));
 fprintf('LS(imphase_PGN)/its    = %1.1f \n', sum(LS_imphase_PGN)/sum(its_imphase_PGN));
@@ -437,7 +489,7 @@ fprintf('LS(imphase_PGNR)/its   = %1.1f \n', sum(LS_imphase_PGNR)/sum(its_imphas
 
 fprintf('\n***** Relative Obj. Fctn. Minima *****\n');
 fprintf('min(ROF_imphasor_GD)    = %1.4e \n', sum(ROF_imphasor_GD)/runs);
-fprintf('min(ROF_imphasor_NLCG)  = %1.4e \n', sum(ROF_imphasor_NLCG)/runs);
+fprintf('min(ROF_imphasor_PGD)   = %1.4e \n', sum(ROF_imphasor_PGD)/runs);
 fprintf('min(ROF_imphasor_LBFGS) = %1.4e \n', sum(ROF_imphasor_BFGS)/runs);
 fprintf('min(ROF_imphasor_GN)    = %1.4e \n', sum(ROF_imphasor_GN)/runs);
 fprintf('min(ROF_imphasor_PGN)   = %1.4e \n', sum(ROF_imphasor_PGN)/runs);
@@ -445,7 +497,7 @@ fprintf('min(ROF_imphasor_PGNR)  = %1.4e \n', sum(ROF_imphasor_PGNR)/runs);
 
 fprintf('\n***** Relative Error Minima *****\n');
 fprintf('min(RE_imphasor_GD)    = %1.4e \n', sum(RE_imphasor_GD)/runs);
-fprintf('min(RE_imphasor_NLCG)  = %1.4e \n', sum(RE_imphasor_NLCG)/runs);
+fprintf('min(RE_imphasor_PGD)   = %1.4e \n', sum(RE_imphasor_PGD)/runs);
 fprintf('min(RE_imphasor_LBFGS) = %1.4e \n', sum(RE_imphasor_BFGS)/runs);
 fprintf('min(RE_imphasor_GN)    = %1.4e \n', sum(RE_imphasor_GN)/runs);
 fprintf('min(RE_imphasor_PGN)   = %1.4e \n', sum(RE_imphasor_PGN)/runs);
@@ -453,7 +505,7 @@ fprintf('min(RE_imphasor_PGNR)  = %1.4e \n', sum(RE_imphasor_PGNR)/runs);
 
 fprintf('\n***** Normalized Cross-Correlation Minima *****\n');
 fprintf('min(NCC_imphasor_GD)   = %1.4e \n', sum(NCC_imphasor_GD)/runs);
-fprintf('min(NCC_imphasor_NLCG) = %1.4e \n', sum(NCC_imphasor_NLCG)/runs);
+fprintf('min(NCC_imphasor_PGD)  = %1.4e \n', sum(NCC_imphasor_PGD)/runs);
 fprintf('min(NCC_imphasor_LBFGS)= %1.4e \n', sum(NCC_imphasor_BFGS)/runs);
 fprintf('min(NCC_imphasor_GN)   = %1.4e \n', sum(NCC_imphasor_GN)/runs);
 fprintf('min(NCC_imphasor_PGN)  = %1.4e \n', sum(NCC_imphasor_PGN)/runs);
@@ -461,7 +513,7 @@ fprintf('min(NCC_imphasor_PGNR) = %1.4e \n', sum(NCC_imphasor_PGNR)/runs);
 
 fprintf('\n***** Outer Iterations til Convergence *****\n');
 fprintf('iters(imphasor_GD)     = %.1f \n', sum(its_imphasor_GD)/runs);
-fprintf('iters(imphasor_NLCG)   = %.1f \n', sum(its_imphasor_NLCG)/runs);
+fprintf('iters(imphasor_PGD)    = %.1f \n', sum(its_imphasor_PGD)/runs);
 fprintf('iters(imphasor_LBFGS)  = %.1f \n', sum(its_imphasor_BFGS)/runs);
 fprintf('iters(imphasor_GN)     = %.1f \n', sum(its_imphasor_GN)/runs);
 fprintf('iters(imphasor_PGN)    = %.1f \n', sum(its_imphasor_PGN)/runs);
@@ -469,7 +521,7 @@ fprintf('iters(imphasor_PGNR)   = %.1f \n', sum(its_imphasor_PGNR)/runs);
 
 fprintf('\n***** Total Time Elapsed *****\n');
 fprintf('time(imphasor_GD)      = %1.4e \n', sum(time_imphasor_GD)/runs);
-fprintf('time(imphasor_NLCG)    = %1.4e \n', sum(time_imphasor_NLCG)/runs);
+fprintf('time(imphasor_PGD)     = %1.4e \n', sum(time_imphasor_PGD)/runs);
 fprintf('time(imphasor_LBFGS)   = %1.4e \n', sum(time_imphasor_BFGS)/runs);
 fprintf('time(imphasor_GN)      = %1.4e \n', sum(time_imphasor_GN)/runs);
 fprintf('time(imphasor_PGN)     = %1.4e \n', sum(time_imphasor_PGN)/runs);
@@ -477,7 +529,7 @@ fprintf('time(imphasor_PGNR)    = %1.4e \n', sum(time_imphasor_PGNR)/runs);
 
 fprintf('\n***** Time per Iteration *****\n');
 fprintf('time(imphasor_GD)/its   = %1.4e \n', sum(time_imphasor_GD)/sum(its_imphasor_GD));
-fprintf('time(imphasor_NLCG)/its = %1.4e \n', sum(time_imphasor_NLCG)/sum(its_imphasor_NLCG));
+fprintf('time(imphasor_PGD)/its  = %1.4e \n', sum(time_imphasor_PGD)/sum(its_imphasor_PGD));
 fprintf('time(imphasor_LBFGS)/its= %1.4e \n', sum(time_imphasor_BFGS)/sum(its_imphasor_BFGS));
 fprintf('time(imphasor_GN)/its   = %1.4e \n', sum(time_imphasor_GN)/sum(its_imphasor_GN));
 fprintf('time(imphasor_PGN)/its  = %1.4e \n', sum(time_imphasor_PGN)/sum(its_imphasor_PGN));
@@ -485,7 +537,7 @@ fprintf('time(imphasor_PGNR)/its = %1.4e \n', sum(time_imphasor_PGNR)/sum(its_im
 
 fprintf('\n***** Avg. Line Search Iterations per Outer Iteration *****\n');
 fprintf('LS(imphasor_GD)/its    = %1.1f \n', sum(LS_imphasor_GD)/sum(its_imphasor_GD));
-fprintf('LS(imphasor_NLCG)/its  = %1.1f \n', sum(LS_imphasor_NLCG)/sum(its_imphasor_NLCG));
+fprintf('LS(imphasor_PGD)/its   = %1.1f \n', sum(LS_imphasor_PGD)/sum(its_imphasor_PGD));
 fprintf('LS(imphasor_LBFGS)/its = %1.1f \n', sum(LS_imphasor_BFGS)/sum(its_imphasor_BFGS));
 fprintf('LS(imphasor_GN)/its    = %1.1f \n', sum(LS_imphasor_GN)/sum(its_imphasor_GN));
 fprintf('LS(imphasor_PGN)/its   = %1.1f \n', sum(LS_imphasor_PGN)/sum(its_imphasor_PGN));

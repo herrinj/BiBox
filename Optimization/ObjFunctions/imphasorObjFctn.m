@@ -85,8 +85,10 @@ if alpha > 0
             Sc = 0.5*alpha*(Sx'*Sx);
         case{'eye',3}
             Sc = 0.5*alpha*(x(:)'*x(:));
+        case{'tv',4}
+            [Sc, dS, S] = wTVReg(x(:), zeros(size(x(:))), dims);
     end
-    Jc = Jc + Sc;
+    Jc = Jc + alpha*Sc;
 end
 
 
@@ -114,6 +116,8 @@ if doGrad % Take the derivative of the objective function w.r.t. the image
                 dJ = dJ + alpha*(S(Sx,'transp')');
             case{'eye',3}
                 dJ = dJ + alpha*x(:)';
+            case{'tv',4}
+                dJ = dJ + alpha*dS(:)';
         end
     end
 end
@@ -142,6 +146,8 @@ if doHess % Returns function handle for Hessian action on a vector. Symmetrix so
                 H = @(p) op(p) + alpha*S(S(p,'notransp'),'transp');
             case{'eye',3}
                 H = @(p) op(p) + alpha*p;
+            case{'tv',4}
+                H = @(p) op(p) + alpha*(S*p);
         end
     else
         H = op;
@@ -158,9 +164,9 @@ function runMinimalExample
     setupBispectrumData;
     image_recur     = real(fftshift(ifft2(fftshift(pospec.*exp(1i*phase_recur)))));
     dims            = size(image_recur);
-    fctn  = @(x) imphasorObjFctn(x, A, bispec_phase, dims, pupil_mask, 'regularizer','grad','alpha',0.1);
+    fctn  = @(x) imphasorObjFctn(x, A, bispec_phase, dims, pupil_mask,'regularizer','tv','alpha',1e-1);
 
-    x = randn(numel(image_recur),1);
+    x = image_recur(:);
     [f0,~,df,d2f] = fctn(x);
 
     h = logspace(-1,-10,10);

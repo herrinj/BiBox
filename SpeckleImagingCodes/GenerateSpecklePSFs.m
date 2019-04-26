@@ -45,7 +45,7 @@ if isempty(D_over_r0), D_over_r0 = 30; end
 % path(path, 'SymmWavefrontGeneration/');
 % path(path, 'FrozenFlow/');
 
-if isempty(seed);
+if isempty(seed)
     rng(0);
 else
     rng(seed);

@@ -42,7 +42,7 @@ lineSearch   = @proj_armijo; % Could potentially call to other projected LS
 % Method options
 verbose      = true;         % flag to print out
 iterSave     = 0;            % flag to save iterations
-iterVP       = 0;            % flag to save VarPro linear variables from para structure
+iterVP       = 0;            % if using this for variable projection
 stop         = zeros(5,1);   % vector for stopping criteria
 Plots        = @(iter,para) []; % for plots;
 
@@ -222,7 +222,7 @@ while 1
         break;
     end
         
-    t = t/2; % sterp reduction factor
+    t = t/2; % step reduction factor
     iter = iter+1;
 end
 end
