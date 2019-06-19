@@ -6,7 +6,7 @@ clear all; close all;
 
 % Setup Gauss-Newton parameters
 n = 256^2;
-upper_bound  = ones(n,1);
+upper_bound  = inf*ones(n,1);
 lower_bound  = zeros(n,1);
 tolJ         = 1e-4;            
 tolY         = 1e-4;           
@@ -55,6 +55,8 @@ ROF_imphasor_PGN     = zeros(runs,1);
 ROF_imphase_PGNR     = zeros(runs,1);
 ROF_imphasor_PGNR    = zeros(runs,1);
 
+RE_init             = zeros(runs,1);
+RE_init_proj        = zeros(runs,1);
 RE_imphase_GD       = zeros(runs,1);
 RE_imphasor_GD      = zeros(runs,1);
 RE_imphase_PGD      = zeros(runs,1);
@@ -134,7 +136,7 @@ for k = 1:runs
     
     % Setup data at each run
     path_SpeckleImagingCodes;
-    [nfr, D_r0, image_name, K_n, sigma_rn] = setupBispectrumParams('nfr',100,'D_r0',30);
+    [nfr, D_r0, image_name, K_n, sigma_rn, fourier_rad, second_rad]  = setupBispectrumParams('nfr',100,'D_r0',30);
     setupBispectrumData;
     image_recur = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*phase_recur(:)),[256 256])))));
     dims = size(image_recur);
@@ -142,6 +144,10 @@ for k = 1:runs
     avg_data_frame = sum(data,3)/size(data,3); avg_data_frame = avg_data_frame/max(avg_data_frame(:));
     obj = obj/max(obj(:));
 
+    RE_init(k)      = norm(image_recur(:) - obj(:))/norm(obj(:)); 
+    RE_init_proj(k) = norm(image_proj(:)  - obj(:))/norm(obj(:)); 
+
+    
     % Run gradient descent for imphase
     fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaPos,'regularizer','pos','weights',weights);
     tic();
@@ -318,7 +324,7 @@ for k = 1:runs
 
 
     % Run projected Gauss-Newton for imphase
-    fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', 0,'regularizer','pos','weights',weights);
+    fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaGrad,'regularizer','grad','weights',weights);
     tic();
     [imphase_PGN, his_imphase_PGN] = GaussNewtonProj(fctn, image_proj(:),...
                                                     'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -336,7 +342,7 @@ for k = 1:runs
     clear imphaseObjFctn;
 
     % Run projected Gauss-Newton for imphasor
-    fctn = @(x) imphasorObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', 0,'regularizer','pos','weights',weights);
+    fctn = @(x) imphasorObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaGrad,'regularizer','grad','weights',weights);
     tic();
     [imphasor_PGN, his_imphasor_PGN] = GaussNewtonProj(fctn, image_proj(:),...
                                                       'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -354,7 +360,7 @@ for k = 1:runs
     clear imphasorObjFctn;
 
     % Run projected Gauss-Newton for imphase
-    fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaGrad,'regularizer','grad','weights',weights);
+    fctn = @(x) imphaseObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaTV,'regularizer','tv','weights',weights);
     tic();
     [imphase_PGNR, his_imphase_PGNR] = GaussNewtonProj(fctn, image_proj(:),...
                                                     'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -372,7 +378,7 @@ for k = 1:runs
     clear imphaseObjFctn;
 
     % Run projected Gauss-Newton for imphasor
-    fctn = @(x) imphasorObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaGrad,'regularizer','grad','weights',weights);
+    fctn = @(x) imphasorObjFctn(x,A, bispec_phase, dims, pupil_mask,'alpha', alphaTV,'regularizer','tv','weights',weights);
     tic();
     [imphasor_PGNR, his_imphasor_PGNR] = GaussNewtonProj(fctn, image_proj(:),...
                                                       'maxIter',maxIter, 'tolJ', tolJ, 'tolY',tolY,'tolG',tolG,...
@@ -396,8 +402,8 @@ end
 for k = 1:runs
     RE_imphase_GD(k)    = norm((sol_imphase_GD(:,k)) - obj(:))/norm(obj(:));   
     RE_imphasor_GD(k)   = norm((sol_imphasor_GD(:,k)) - obj(:))/norm(obj(:));  
-    RE_imphase_PGD(k)    = norm((sol_imphase_PGD(:,k)) - obj(:))/norm(obj(:));   
-    RE_imphasor_PGD(k)   = norm((sol_imphasor_PGD(:,k)) - obj(:))/norm(obj(:)); 
+    RE_imphase_PGD(k)   = norm((sol_imphase_PGD(:,k)) - obj(:))/norm(obj(:));   
+    RE_imphasor_PGD(k)  = norm((sol_imphasor_PGD(:,k)) - obj(:))/norm(obj(:)); 
 %     RE_imphase_NLCG(k)  = norm((sol_imphase_NLCG(:,k)) - obj(:))/norm(obj(:));  
 %     RE_imphasor_NLCG(k) = norm((sol_imphasor_NLCG(:,k)) - obj(:))/norm(obj(:));  
     RE_imphase_BFGS(k)  = norm((sol_imphase_BFGS(:,k)) - obj(:))/norm(obj(:));  
@@ -429,6 +435,7 @@ end
 % Print some results to the terminal window
 clc;
 
+
 fprintf('\n***** Relative Obj. Fctn. Minima *****\n');
 fprintf('min(ROF_imphase_GD)     = %1.4e \n', sum(ROF_imphase_GD)/runs);
 fprintf('min(ROF_imphase_PGD)    = %1.4e \n', sum(ROF_imphase_PGD)/runs);
@@ -438,6 +445,8 @@ fprintf('min(ROF_imphase_PGN)    = %1.4e \n', sum(ROF_imphase_PGN)/runs);
 fprintf('min(ROF_imphase_PGNR)   = %1.4e \n', sum(ROF_imphase_PGNR)/runs);
 
 fprintf('\n***** Relative Error Minima *****\n');
+fprintf('min(RE_init)           = %1.4e \n', sum(RE_init)/runs);
+fprintf('min(RE_init_proj)      = %1.4e \n', sum(RE_init_proj)/runs);
 fprintf('min(RE_imphase_GD)     = %1.4e \n', sum(RE_imphase_GD)/runs);
 fprintf('min(RE_imphase_PGD)    = %1.4e \n', sum(RE_imphase_PGD)/runs);
 fprintf('min(RE_imphase_LBFGS)  = %1.4e \n', sum(RE_imphase_BFGS)/runs);
@@ -496,6 +505,8 @@ fprintf('min(ROF_imphasor_PGN)   = %1.4e \n', sum(ROF_imphasor_PGN)/runs);
 fprintf('min(ROF_imphasor_PGNR)  = %1.4e \n', sum(ROF_imphasor_PGNR)/runs);
 
 fprintf('\n***** Relative Error Minima *****\n');
+fprintf('min(RE_init)           = %1.4e \n', sum(RE_init)/runs);
+fprintf('min(RE_init_proj)      = %1.4e \n', sum(RE_init_proj)/runs);
 fprintf('min(RE_imphasor_GD)    = %1.4e \n', sum(RE_imphasor_GD)/runs);
 fprintf('min(RE_imphasor_PGD)   = %1.4e \n', sum(RE_imphasor_PGD)/runs);
 fprintf('min(RE_imphasor_LBFGS) = %1.4e \n', sum(RE_imphasor_BFGS)/runs);

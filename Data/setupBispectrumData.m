@@ -39,8 +39,6 @@ STAR = fftshift(fft2(fftshift(star)));
 
 % Generate the index structure to vectorize the bispectrum operations
 N = size(data,1); % expects square images
-fourier_rad = 96; 
-second_rad = 5;
 pupil_mask0 = MakeMask(fourier_rad*2,1);
 pupil_mask = padarray(pupil_mask0, [(256 - size(pupil_mask0,1))/2, (256 - size(pupil_mask0,2))/2], 'both');
 [b,~] = bindex(N,fourier_rad, second_rad,0); % Change 4th argument to 1 for visualization

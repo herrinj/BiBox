@@ -115,7 +115,7 @@ for k = 1:runs
     
     % Setup data at each run
     path_SpeckleImagingCodes;
-    [nfr, D_r0, image_name, K_n, sigma_rn] = setupBispectrumParams('nfr',100,'D_r0',30);
+    [nfr, D_r0, image_name, K_n, sigma_rn, fourier_rad, second_rad]  = setupBispectrumParams('nfr',100,'D_r0',30);
     setupBispectrumData;
     image_recur = real(fftshift(ifft2(fftshift(reshape(pospec(:).*exp(1i*phase_recur(:)),[256 256])))));
     dims = size(image_recur);
